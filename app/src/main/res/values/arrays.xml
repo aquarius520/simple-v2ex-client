@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="discover_categories">
+        <item>技术</item>
+        <item>创意</item>
+        <item>好玩</item>
+        <item>Apple</item>
+        <item>酷工作</item>
+        <item>交易</item>
+        <item>城市</item>
+        <item>问与答</item>
+        <item>最热</item> <!-- 这里的最热和api中提供hot.json内容不同 -->
+        <item>全部</item> <!-- api接口更新数据应该是有时间间隔，导致数据更新不及时, 全部分类不必写入type字段 -->
+        <item>R2</item>
+    </string-array>
+
+    <string-array name="category_types">
+        <item>tech</item>
+        <item>creative</item>
+        <item>play</item>
+        <item>apple</item>
+        <item>jobs</item>
+        <item>deals</item>
+        <item>city</item>
+        <item>qna</item>
+        <item>hot</item>
+        <item>all</item>
+        <item>r2</item>
+    </string-array>
+</resources>

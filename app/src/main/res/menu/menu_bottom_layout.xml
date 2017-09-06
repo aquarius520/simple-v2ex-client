@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/newest_menu_button"
+        android:icon="@drawable/newest_tab_button_selector"
+        android:title="@string/newest" />
+
+    <item
+        android:id="@+id/hot_menu_button"
+        android:icon="@drawable/hot_tab_button_selector"
+        android:title="@string/hot" />
+
+    <item
+        android:id="@+id/discover_menu_button"
+        android:icon="@drawable/discover_tab_button_selector"
+        android:title="@string/discover" />
+
+    <item
+        android:id="@+id/allinfo_menu_button"
+        android:icon="@drawable/all_tab_button_selector"
+        android:title="@string/all" />
+
+    <item
+        android:id="@+id/setting_menu_button"
+        android:icon="@drawable/setting_tab_button_selector"
+        android:title="@string/my" />
+</menu>

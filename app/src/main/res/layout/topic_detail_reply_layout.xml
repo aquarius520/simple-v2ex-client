@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp">
+
+        <cn.bingoogolapple.badgeview.BGABadgeImageView
+            android:id="@+id/avatar"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_avatar" />
+
+        <RelativeLayout
+            android:id="@+id/replier_container"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_toRightOf="@id/avatar"
+            android:layout_marginRight="16dp">
+
+            <TextView
+                android:id="@+id/replier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:gravity="center_vertical"
+                android:layout_centerVertical="true"
+                android:textColor="@color/colorNameText"
+                android:textStyle="bold"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@id/replier"
+                android:gravity="center_vertical"
+                android:layout_centerVertical="true"
+                android:textColor="@color/colorTimeText"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/which_floor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/colorTimeText"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+        <com.aquarius.simplev2ex.views.RichTextView
+            android:id="@+id/reply_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/replier_container"
+            android:layout_toRightOf="@id/avatar"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="4dp"
+            android:textColorLink="@color/colorTextLink"
+             />
+
+    <!--
+        <RelativeLayout
+            android:id="@+id/comment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/content"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_toRightOf="@+id/avatar">
+
+            <CheckBox
+                android:id="@+id/commentBtn"
+                android:layout_width="50dp"
+                android:layout_height="25dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:button="@drawable/checkbox_comment" />
+        </RelativeLayout>
+        -->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:layout_below="@id/reply_content"
+        android:background="@color/colorLine"/>
+
+    </RelativeLayout>
