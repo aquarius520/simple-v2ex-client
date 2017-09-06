@@ -26,7 +26,6 @@ import java.util.List;
  */
 public class TopicListPagerAdapter extends PagerAdapter {
 
-
     private static final String[] DISCOVER_CATEGORIES = V2exApplication.getInstance().getResources()
             .getStringArray(R.array.discover_categories);
 

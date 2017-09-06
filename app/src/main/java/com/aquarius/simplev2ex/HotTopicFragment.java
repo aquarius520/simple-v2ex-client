@@ -13,6 +13,7 @@ import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
+import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -62,8 +63,17 @@ public class HotTopicFragment extends BaseFragment {
 
 
     private void requestHotTopicInfo() {
+        // 1. 先读取数据库中对应的记录，仅截取所保存记录中最后一天的话题
+
+        // 2. 如果有数据则展示
+
+
         if (NetWorkUtil.isConnected()) {
             OkHttpHelper.get(V2exManager.getHotTopicUrl(), new HotTopicRequestCallBack(mHandler));
+        }else {
+            mRefreshLayout.setRefreshing(false);
+            MessageUtil.showNetworkErrorMsg(mContext, mContext.getResources().getString(R.string.network_error),
+                    mContext.getResources().getString(R.string.network_error_label));
         }
     }
 
@@ -82,17 +92,16 @@ public class HotTopicFragment extends BaseFragment {
 
         @Override
         public void onResponseFailure(String error) {
-            Log.d(TAG, "onFailure, run in thread : " +
-                    Thread.currentThread().getName() + "-" + Thread.currentThread().getId());
             mRefreshLayout.setRefreshing(false);
         }
 
         @Override
         public void onResponseSuccess(List<TopicItem> data) {
-            Log.d(TAG, "onResponse, run in thread : "+
-                    Thread.currentThread().getName() + "-" + Thread.currentThread().getId());
             mAdapter.update(data, true);
             mRefreshLayout.setRefreshing(false);
+
+            // 保存话题记录
+            // startService
         }
     }
 

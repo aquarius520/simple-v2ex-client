@@ -13,6 +13,7 @@ import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
+import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -64,6 +65,10 @@ public class NewestFragment extends BaseFragment {
     private void requestNewestTopicInfo() {
         if (NetWorkUtil.isConnected()) {
             OkHttpHelper.get(V2exManager.getNewestTopicUrl(), new NewestRequestCallBack(mHandler));
+        }else {
+            mRefreshLayout.setRefreshing(false);
+            MessageUtil.showNetworkErrorMsg(mContext, mContext.getResources().getString(R.string.network_error),
+                    mContext.getResources().getString(R.string.network_error_label));
         }
     }
 

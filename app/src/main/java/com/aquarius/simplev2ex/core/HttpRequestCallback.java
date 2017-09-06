@@ -26,7 +26,13 @@ public abstract class HttpRequestCallback<T> implements Callback {
 
     @Override
     public void onFailure(Call call, IOException e) {
-        onResponseFailure(e.getMessage());
+        final String msg = e.getMessage();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                onResponseFailure(msg);
+            }
+        });
     }
 
     @Override
