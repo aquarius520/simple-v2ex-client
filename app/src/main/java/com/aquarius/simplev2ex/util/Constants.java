@@ -18,4 +18,7 @@ public class Constants {
     public static final String ACTION_SELECT = "select";
     public static final String ACTION_DELETE = "delete";
 
+
+    // preference 配置
+    public static final String KEY_LAST_REFRESH_NODES_TIME = "last_refresh_nodes_time";
 }

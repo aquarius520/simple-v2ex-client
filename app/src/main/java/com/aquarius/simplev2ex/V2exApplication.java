@@ -2,10 +2,10 @@ package com.aquarius.simplev2ex;
 
 import android.app.Application;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.aquarius.simplev2ex.config.AppConfig;
 import com.aquarius.simplev2ex.core.DataService;
 import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.entity.Node;
@@ -17,7 +17,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -42,7 +41,9 @@ public class V2exApplication extends Application {
         super.onCreate();
         context = this;
 
-        requestNodesAndSaveInTable();
+        if (AppConfig.readPreference(this, Constants.KEY_LAST_REFRESH_NODES_TIME, 0l) == 0l) {
+            requestNodesAndSaveInTable();
+        }
     }
 
     private void requestNodesAndSaveInTable() {
@@ -70,6 +71,8 @@ public class V2exApplication extends Application {
                         context.startService(intent);
 
                         // 保存记录，表示已经请求过，也可保存时间，间隔一段时间后再次请求做更新操作
+                        AppConfig.writeToPreference(context, Constants.KEY_LAST_REFRESH_NODES_TIME,
+                                System.currentTimeMillis());
                     }
                 }
             });
