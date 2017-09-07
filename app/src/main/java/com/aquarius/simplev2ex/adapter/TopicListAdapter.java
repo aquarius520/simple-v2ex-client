@@ -172,6 +172,14 @@ public class TopicListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyDataSetChanged();
     }
 
+    public void initTopics(List<TopicItem> data) {
+        if(data == null || data.size() == 0){
+            return;
+        }
+        mTopics = data;
+    }
+
+
     static class TopicItemHolder extends RecyclerView.ViewHolder {
 
         CardView cardContainer;

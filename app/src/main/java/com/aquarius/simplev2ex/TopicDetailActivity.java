@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,8 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aquarius.simplev2ex.adapter.TopicRepliesAdapter;
+import com.aquarius.simplev2ex.core.DataService;
 import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
+import com.aquarius.simplev2ex.database.DataBaseManager;
 import com.aquarius.simplev2ex.entity.Member;
 import com.aquarius.simplev2ex.entity.Node;
 import com.aquarius.simplev2ex.entity.Reply;
@@ -27,7 +30,9 @@ import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.support.HeaderViewRecyclerAdapter;
 import com.aquarius.simplev2ex.support.ItemAnimationUtil;
+import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.GlideUtil;
+import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.aquarius.simplev2ex.util.TimeUtil;
 import com.aquarius.simplev2ex.views.RichTextView;
@@ -35,6 +40,7 @@ import com.aquarius.simplev2ex.views.TitleTopBar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -69,6 +75,8 @@ public class TopicDetailActivity extends Activity {
     private Member member;
     private Node node;
 
+    private List<Reply> mReplies;
+
     private Handler mHandler = new Handler();
 
     @Override
@@ -85,8 +93,7 @@ public class TopicDetailActivity extends Activity {
                 topicId = item.getId();
                 topicTitle = item.getTitle();
                 nodeTitle = item.getNode().getTitle();
-                topicContent = item.getContent().equals(item.getContent_rendered()) ? item.getContent()
-                        : item.getContent_rendered();
+                topicContent = item.getContent_rendered();
                 avatarUrl = item.getMember().getAvatar_normal();
                 avatarUrl = avatarUrl.startsWith("//") ? "http:" + avatarUrl : avatarUrl;
                 name = item.getMember().getUsername();
@@ -99,6 +106,7 @@ public class TopicDetailActivity extends Activity {
         initViews();
         setHeaderView();
         bindDataAndSetListener();
+        initList();
         requestData();
     }
 
@@ -195,19 +203,34 @@ public class TopicDetailActivity extends Activity {
         startActivity(intent);
     }
 
+    private void initList() {
+        mReplies = new ArrayList<>();
+    }
+
     private void requestData() {
         refreshLayout.setRefreshing(true);
         requestRepliesInfo();
     }
 
     private void requestRepliesInfo() {
+        // 1.读取数据库记录 有数据先展示
+        mReplies = DataBaseManager.init().queryReplies(topicId);
+        if (mReplies.size() > 0) {
+            mRepliesAdapter.update(mReplies, true);
+            refreshLayout.setRefreshing(false);
+        }
+
+        // 2.请求网络，获取最新的回复列表
         if (NetWorkUtil.isConnected()) {
 
             if (TextUtils.isEmpty(topicContent)) {
                  OkHttpHelper.get(V2exManager.getTopicByTopicIdUrl(topicId), new TopicContentRequest(mHandler));
             }
-
             OkHttpHelper.get(V2exManager.getTopicRepliesUrl(topicId), new TopicReplyRequest(mHandler));
+        } else {
+            refreshLayout.setRefreshing(false);
+            MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),
+                    this.getResources().getString(R.string.network_error_label));
         }
     }
 
@@ -237,6 +260,16 @@ public class TopicDetailActivity extends Activity {
                 topicContent = item.getContent().equals(item.getContent_rendered())
                         ? item.getContent() : item.getContent_rendered();
                 contentTv.setRichText(topicContent);
+                // 更新topic内容
+                // 更新member id/avatar...等
+                Intent intent = new Intent(TopicDetailActivity.this, DataService.class);
+                Bundle bundle = new Bundle();
+                intent.putExtra(Constants.DATA_SOURCE, "topic");
+                intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_UPDATE);
+                intent.putExtra(Constants.TOPIC_ID, topicId);
+                bundle.putParcelable("topic", item);
+                intent.putExtras(bundle);
+                TopicDetailActivity.this.startService(intent);
             }
         }
     }
@@ -260,14 +293,41 @@ public class TopicDetailActivity extends Activity {
 
         @Override
         public void onResponseSuccess(List<Reply> data) {
-            int newCount = mRepliesAdapter.update(data, true);
+            mRepliesAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
+
+            int newCount = 0;
+            ArrayList<Reply> newUpdateList = null;
+            if(data != null && data.size() > 0) {
+                newCount = updateCount(data);
+                mReplies = data;
+                if (newCount > 0) {
+                    newUpdateList.addAll(mReplies.subList(data.size() - newCount, data.size()));
+                }
+            }
+
+            Intent intent = new Intent(TopicDetailActivity.this, DataService.class);
+            Bundle bundle = new Bundle();
+            intent.putExtra(Constants.DATA_SOURCE, "replies");
+            intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
+            intent.putExtra(Constants.TOPIC_ID, topicId);
+            bundle.putParcelableArrayList("replies", newUpdateList != null ? newUpdateList : (ArrayList) mReplies);
+            intent.putExtras(bundle);
+            TopicDetailActivity.this.startService(intent);
+
             if(newCount > 0) {
                 Toast.makeText(TopicDetailActivity.this, "新增了" + newCount + " 条回复.", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    private int updateCount(List<Reply> data) {
+        int count = 0;
+        if (mReplies.size() > 0) {
+            count = data.size() - mReplies.size();
+        }
+        return count;
+    }
 
     @Override
     protected void onResume() {

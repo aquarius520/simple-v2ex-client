@@ -19,6 +19,8 @@ public class Member implements Parcelable, Serializable{
     private String avatar_mini;     // 用户小头像地址(不包括协议头)
     private String avatar_normal;   // 正常大小头像
     private String avatar_large;    // 大头像
+    private String bio;
+    private long created;
 
     private Member(Builder builder) {
         this.id = builder.id;
@@ -27,16 +29,20 @@ public class Member implements Parcelable, Serializable{
         this.avatar_mini = builder.avatar_mini;
         this.avatar_normal = builder.avatar_normal;
         this.avatar_large = builder.avatar_large;
+        this.bio = builder.bio;
+        this.created = builder.created;
     }
 
     public Member(int id, String username, String tagline, String avatar_mini,
-                  String avatar_normal, String avatar_large) {
+                  String avatar_normal, String avatar_large, String bio , long created) {
         this.id = id;
         this.username = username;
         this.tagline = tagline;
         this.avatar_mini = avatar_mini;
         this.avatar_normal = avatar_normal;
         this.avatar_large = avatar_large;
+        this.bio = bio;
+        this.created = created;
     }
 
     protected Member(Parcel in) {
@@ -46,6 +52,8 @@ public class Member implements Parcelable, Serializable{
         avatar_mini = in.readString();
         avatar_normal = in.readString();
         avatar_large = in.readString();
+        bio = in.readString();
+        created = in.readLong();
     }
 
     public static final Creator<Member> CREATOR = new Creator<Member>() {
@@ -84,6 +92,14 @@ public class Member implements Parcelable, Serializable{
         return avatar_large;
     }
 
+    public String getBio() {
+        return bio;
+    }
+
+    public long getCreated() {
+        return created;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -114,6 +130,8 @@ public class Member implements Parcelable, Serializable{
                 ", avatar_mini='" + avatar_mini + '\'' +
                 ", avatar_normal='" + avatar_normal + '\'' +
                 ", avatar_large='" + avatar_large + '\'' +
+                ", bio='" + bio + '\'' +
+                ", created='" + created + '\'' +
                 '}';
     }
 
@@ -130,6 +148,8 @@ public class Member implements Parcelable, Serializable{
         dest.writeString(avatar_mini);
         dest.writeString(avatar_normal);
         dest.writeString(avatar_large);
+        dest.writeString(bio);
+        dest.writeLong(created);
     }
 
     public static class Builder {
@@ -139,6 +159,8 @@ public class Member implements Parcelable, Serializable{
         private String avatar_mini;     // optional
         private String avatar_normal;   // optional
         private String avatar_large;    // optional
+        private String bio;
+        private long created;
 
         public Builder( String username) {
             this.username = username;
@@ -171,6 +193,16 @@ public class Member implements Parcelable, Serializable{
 
         public Builder setAvatarLarge(String avatar_large) {
             this.avatar_large = avatar_large;
+            return this;
+        }
+
+        public Builder setBio(String bio) {
+            this.bio = bio;
+            return this;
+        }
+
+        public Builder created(long created) {
+            this.created = created;
             return this;
         }
 

@@ -86,16 +86,10 @@ public class TopicRepliesAdapter extends RecyclerView.Adapter<TopicRepliesAdapte
 
     }
 
-    // 不为0 则表示刷新后更新了count条回复
-    public int update(List<Reply> data, boolean merge) {
-        if(data == null || data.size() == 0) return 0;
-        int count = 0;
-        if (mReplies.size() > 0 && merge) {
-            count = data.size() - mReplies.size();
-        }
+    public void update(List<Reply> data, boolean merge) {
+        if(data == null || data.size() == 0) return ;
         mReplies = data;
         notifyDataSetChanged();
-        return count;
     }
 
     static class RepliesViewHolder extends RecyclerView.ViewHolder {

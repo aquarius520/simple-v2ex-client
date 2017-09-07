@@ -1,10 +1,13 @@
 package com.aquarius.simplev2ex.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by aquarius on 2017/8/15.
  * 话题的回复
  */
-public class Reply {
+public class Reply implements Parcelable {
 
     private int id;
     private int thanks;
@@ -23,6 +26,28 @@ public class Reply {
         this.created = created;
         this.last_modified = last_modified;
     }
+
+    protected Reply(Parcel in) {
+        id = in.readInt();
+        thanks = in.readInt();
+        content = in.readString();
+        content_rendered = in.readString();
+        member = in.readParcelable(Member.class.getClassLoader());
+        created = in.readLong();
+        last_modified = in.readLong();
+    }
+
+    public static final Creator<Reply> CREATOR = new Creator<Reply>() {
+        @Override
+        public Reply createFromParcel(Parcel in) {
+            return new Reply(in);
+        }
+
+        @Override
+        public Reply[] newArray(int size) {
+            return new Reply[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -51,6 +76,7 @@ public class Reply {
     public long getLast_modified() {
         return last_modified;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -84,5 +110,21 @@ public class Reply {
                 ", created=" + created +
                 ", last_modified=" + last_modified +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeInt(thanks);
+        dest.writeString(content);
+        dest.writeString(content_rendered);
+        dest.writeParcelable(member, flags);
+        dest.writeLong(created);
+        dest.writeLong(last_modified);
     }
 }

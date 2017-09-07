@@ -213,6 +213,11 @@ public class TopicItem implements Parcelable, Serializable {
             return this;
         }
 
+        public Builder content_rendered(String content_rendered) {
+            this.content_rendered = content_rendered;
+            return this;
+        }
+
         public Builder replies(int replies) {
             this.replies = replies;
             return this;

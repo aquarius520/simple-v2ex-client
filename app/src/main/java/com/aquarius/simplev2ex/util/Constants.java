@@ -1,9 +1,18 @@
 package com.aquarius.simplev2ex.util;
 
+import com.aquarius.simplev2ex.R;
+import com.aquarius.simplev2ex.V2exApplication;
+
 /**
  * Created by aquarius on 2017/9/5.
  */
 public class Constants {
+
+    public static final String[] DISCOVER_CATEGORIES = V2exApplication.getInstance().getResources()
+            .getStringArray(R.array.discover_categories);
+
+    public static final String[] CATEGORY_TYPES = V2exApplication.getInstance().getResources()
+            .getStringArray(R.array.category_types);
 
     public static final String ACTION_USER_HOMEPAGE = "android.intent.action.user.homepage";
 
@@ -13,12 +22,17 @@ public class Constants {
 
     public static final String DATA_SOURCE = "source";
     public static final String DATA_ACTION = "action";
+    public static final String DATA_CATEGORY = "category";
+
+    // 字段
+    public static final String TOPIC_ID = "topic_id";
 
 
     public static final String ACTION_INSERT = "insert";
     public static final String ACTION_QUERY = "query";
     public static final String ACTION_SELECT = "select";
     public static final String ACTION_DELETE = "delete";
+    public static final String ACTION_UPDATE = "update";
 
 
     // preference 配置

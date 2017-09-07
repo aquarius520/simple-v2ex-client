@@ -24,15 +24,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MEMBER_AVATAR_MINI = "avatar_mini";
     public static final String MEMBER_AVATAR_NORMAL = "avatar_normal";
     public static final String MEMBER_AVATAR_LARGE = "avatar_large";
+    public static final String MEMBER_BIO = "bio";
+    public static final String MEMBER_CREATED = "created";
+
 
     public static final String CREATE_TABLE_MEMBER_SQL = "CREATE TABLE " + TABLE_MEMBER_NAME +
             " ( " +
-            MEMBER_ID + " INTEGER PRIMARY KEY, " +
+            MEMBER_ID + " INTEGER , " +
             MEMBER_NAME + " TEXT NOT NULL ," +
             MEMBER_TAGLINE + " TEXT," +
             MEMBER_AVATAR_MINI + " TEXT," +
             MEMBER_AVATAR_NORMAL + " TEXT, " +
             MEMBER_AVATAR_LARGE + " TEXT, " +
+            MEMBER_BIO + " TEXT, " +
+            MEMBER_CREATED + " TEXT, " +
             "UNIQUE(" + MEMBER_NAME + ")" +
             " ); ";
 
@@ -44,8 +49,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TOPIC_CONTENT = "content";
     public static final String TOPIC_CONTENT_RENDERED = "content_rendered";
     public static final String TOPIC_REPLIES = "replies";
-    public static final String TOPIC_MEMBER_ID = "member_id";
-    public static final String TOPIC_NODE_ID = "node_id";
+    public static final String TOPIC_MEMBER_NAME = "member_name";
+    public static final String TOPIC_NODE_NAME = "node_name";
     public static final String TOPIC_CREATED = "created";
     public static final String TOPIC_LAST_MODIFIED = "last_modified";
     public static final String TOPIC_LAST_TOUCHED = "last_touched";
@@ -59,8 +64,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             TOPIC_CONTENT + " TEXT NOT NULL DEFAULT '', " +
             TOPIC_CONTENT_RENDERED + " TEXT," +
             TOPIC_REPLIES + " INTEGER NOT NULL DEFAULT 0, " +
-            TOPIC_MEMBER_ID + " INTEGER NOT NULL, " +
-            TOPIC_NODE_ID + " INTEGER NOT NULL, " +
+            TOPIC_MEMBER_NAME + " TEXT NOT NULL, " +
+            TOPIC_NODE_NAME + " TEXT NOT NULL, " +
             TOPIC_CREATED + " TEXT , " +
             TOPIC_LAST_MODIFIED + " TEXT," +
             TOPIC_LAST_TOUCHED + " TEXT" +
@@ -76,6 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String REPLY_CONTENT = "content";
     public static final String REPLY_CONTENT_RENDERED = "content_rendered";
     public static final String REPLY_MEMBER_ID = "member_id";
+    public static final String REPLY_TOPIC_ID = "topic_id";
     public static final String REPLY_CREATED = "created";
     public static final String REPLY_LAST_MODIFIED = "last_modified";
 
@@ -86,6 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             REPLY_CONTENT + " TEXT , " +
             REPLY_CONTENT_RENDERED + " TEXT, " +
             REPLY_MEMBER_ID + " INTEGER NOT NULL, " +
+            REPLY_TOPIC_ID + " INTEGER NOT NULL, " +
             REPLY_CREATED + " TEXT," +
             REPLY_LAST_MODIFIED + " TEXT " +
             " ); " ;
@@ -116,6 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             NODE_HEADER + " TEXT," +
             NODE_FOOTER + " TEXT," +
             NODE_CREATED + " TEXT" +
+
             " ); ";
 
 
