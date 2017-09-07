@@ -28,7 +28,7 @@ public class DataService extends IntentService {
 
             if (source.equals("nodes")) {
                 ArrayList<Node> nodes = intent.getExtras().getParcelableArrayList("nodes");
-                DataBaseManager.init().insertNodes(nodes);
+                DataBaseManager.init().insertList(nodes, "nodes");
             }
         }
     }

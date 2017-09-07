@@ -6,7 +6,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.aquarius.simplev2ex.V2exApplication;
+import com.aquarius.simplev2ex.entity.Member;
 import com.aquarius.simplev2ex.entity.Node;
+import com.aquarius.simplev2ex.entity.Reply;
+import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.entity.TopicNode;
 
 import java.util.ArrayList;
@@ -62,16 +65,41 @@ public class DataBaseManager {
         return count > 0;
     }
 
-    public boolean insertNodes(List<Node> nodes) {
-        if(nodes == null || nodes.size() == 0) return  false;
+//    public boolean insertNodes(List<Node> nodes) {
+//        if(nodes == null || nodes.size() == 0) return false;
+//        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+//        long count = 0;
+//        try {
+//            if (db != null) {
+//                // 开启事务
+//                db.beginTransaction();
+//                for (Node node : nodes) {
+//                    db.insert(DatabaseHelper.TABLE_NODE_NAME, null, generateNodeParams(node));
+//                    count++;
+//                }
+//                db.setTransactionSuccessful();
+//                db.endTransaction();
+//                db.close();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        } finally {
+//            if(db != null) db.close();
+//        }
+//        return count > 0;
+//    }
+
+    public <T> boolean insertList(List<T> list, String type) {
+        if(list == null || list.size() == 0) return false;
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         long count = 0;
         try {
             if (db != null) {
                 // 开启事务
                 db.beginTransaction();
-                for (Node node : nodes) {
-                    db.insert(DatabaseHelper.TABLE_NODE_NAME, null, generateNodeParams(node));
+                for (T t : list) {
+                    db.insert(table(type), null, generateInsertCvs(t, type));
                     count++;
                 }
                 db.setTransactionSuccessful();
@@ -130,6 +158,64 @@ public class DataBaseManager {
             if(db != null) db.close();
         }
         return nodes;
+    }
+
+    private String table(String type) {
+
+        if (type.equals("topics") || type.equals("topic")) {
+            return DatabaseHelper.TABLE_TOPIC_NAME;
+        }
+
+        if(type.equals("replies") || type.equals("reply")) {
+            return DatabaseHelper.TABLE_REPLY_NAME;
+        }
+
+        if (type.equals("members") || type.equals("member")) {
+            return DatabaseHelper.TABLE_MEMBER_NAME;
+        }
+
+        if (type.equals("nodes") || type.equals("node")) {
+            return DatabaseHelper.TABLE_NODE_NAME;
+        }
+
+        return null;
+    }
+
+    private <T> ContentValues generateInsertCvs(T t, String type) {
+
+        if (type.equals("topics") || type.equals("topic")) {
+            return generateTopicParams((TopicItem)t);
+        }
+
+        if(type.equals("replies") || type.equals("reply")) {
+            return generateReplyParams((Reply)t);
+        }
+
+        if (type.equals("members") || type.equals("member")) {
+            return generateMemberParams((Member)t);
+        }
+
+        if (type.equals("nodes") || type.equals("node")) {
+            return generateNodeParams((Node)t);
+        }
+
+        return null;
+    }
+
+    private ContentValues generateTopicParams(TopicItem topicItem) {
+        ContentValues cv = new ContentValues();
+        return cv;
+    }
+
+
+    private ContentValues generateReplyParams(Reply reply) {
+        ContentValues cv = new ContentValues();
+        return cv;
+    }
+
+    private ContentValues generateMemberParams(Member member) {
+        ContentValues cv = new ContentValues();
+        return cv;
     }
 
     private ContentValues generateNodeParams(Node node) {

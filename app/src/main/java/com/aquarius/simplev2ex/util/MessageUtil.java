@@ -33,7 +33,7 @@ public class MessageUtil {
                         .actionListener(new ActionClickListener() {
                             @Override
                             public void onActionClicked(Snackbar snackbar) {
-                                Log.d(TAG, "action clicked !");
+                                // Log.d(TAG, "action clicked !");
                             }
                         }) // action button's ActionClickListener
                 , (Activity) context); // activity where it is displayed

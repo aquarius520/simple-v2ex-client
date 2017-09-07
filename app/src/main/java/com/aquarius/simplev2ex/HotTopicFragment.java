@@ -13,11 +13,15 @@ import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
+import com.aquarius.simplev2ex.util.Constants;
+import com.aquarius.simplev2ex.util.FileUtil;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 /**
  * Created by aquarius on 2017/8/6.
@@ -28,6 +32,8 @@ public class HotTopicFragment extends BaseFragment {
     private SwipeRefreshLayout mRefreshLayout;
     private RecyclerView mRecyclerView;
     private TopicListAdapter mAdapter;
+    private List<TopicItem> mTopics;
+
 
     @Override
     protected View inflateView(LayoutInflater inflater, ViewGroup container) {
@@ -44,7 +50,7 @@ public class HotTopicFragment extends BaseFragment {
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestHotTopicInfo();
+                requestHotTopicInfo(true);
             }
         });
     }
@@ -52,23 +58,27 @@ public class HotTopicFragment extends BaseFragment {
     @Override
     protected void doOnActivityCreated() {
         Log.d(TAG, "onActivityCreated() ...");
+        mTopics = new ArrayList<>();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mRefreshLayout.setRefreshing(true);
-                requestHotTopicInfo();
+                requestHotTopicInfo(false);
             }
         }, 300);
     }
 
 
-    private void requestHotTopicInfo() {
-        // 1. 先读取数据库中对应的记录，仅截取所保存记录中最后一天的话题
+    private void requestHotTopicInfo(boolean force) {
+        // 1. 因为热议话题有接口，较解析网页返回数据完整，这里使用反序列化读取
+        String filepath = mContext.getFilesDir().getPath() + File.separator + Constants.FILE_HOT_TOPICS_LIST;
+        if(!force && FileUtil.checkFileExist(filepath)){
+            List<TopicItem> data = (List<TopicItem>) FileUtil.readObject(mContext, Constants.FILE_HOT_TOPICS_LIST);
+            mAdapter.update(data, false);
+            return;
+        }
 
-        // 2. 如果有数据则展示
-
-
-        if (NetWorkUtil.isConnected()) {
+        // 2. 如果本地没有数据,则主动请求一次
+       if (NetWorkUtil.isConnected()) {
             OkHttpHelper.get(V2exManager.getHotTopicUrl(), new HotTopicRequestCallBack(mHandler));
         }else {
             mRefreshLayout.setRefreshing(false);
@@ -87,7 +97,10 @@ public class HotTopicFragment extends BaseFragment {
         public List<TopicItem> parseResultToList(String result) {
             Gson gson = new Gson();
             //TODO: 使用TypeToken后 Gson是如何保证泛型信息不被擦除？
-            return gson.fromJson(result, new TypeToken<List<TopicItem>>(){}.getType());
+            List<TopicItem> data = gson.fromJson(result, new TypeToken<List<TopicItem>>(){}.getType());
+            int count = updateList(data);
+            FileUtil.write(mContext, Constants.FILE_HOT_TOPICS_LIST,  data);
+            return mTopics;
         }
 
         @Override
@@ -97,12 +110,32 @@ public class HotTopicFragment extends BaseFragment {
 
         @Override
         public void onResponseSuccess(List<TopicItem> data) {
-            mAdapter.update(data, true);
+            mAdapter.update(data, false);
             mRefreshLayout.setRefreshing(false);
-
-            // 保存话题记录
-            // startService
         }
     }
 
+    private int updateList(List<TopicItem> data) {
+        if(data == null || data.size() == 0){
+            return 0;
+        }
+        int count = 0;
+        if (mTopics.size() > 0) {
+            for(int i = 0 ; i < mTopics.size(); i++) {
+                TopicItem item = mTopics.get(i);
+                boolean exist = false;
+                for(int j = 0; j < data.size(); j++) {
+                    if (item.getId() == data.get(j).getId()) {
+                        exist = true;
+                        break;
+                    }
+                }
+                if(exist) continue;
+                count++;
+                data.add(item);
+            }
+        }
+        mTopics = data;
+        return count;
+    }
 }

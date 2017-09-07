@@ -13,11 +13,15 @@ import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
+import com.aquarius.simplev2ex.util.Constants;
+import com.aquarius.simplev2ex.util.FileUtil;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +33,7 @@ public class NewestFragment extends BaseFragment {
     private SwipeRefreshLayout mRefreshLayout;
     private RecyclerView mRecyclerView;
     private TopicListAdapter mAdapter;
+    private List<TopicItem> mTopics;
 
     @Override
     protected View inflateView(LayoutInflater inflater, ViewGroup container) {
@@ -45,7 +50,8 @@ public class NewestFragment extends BaseFragment {
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestNewestTopicInfo();
+                mRefreshLayout.setRefreshing(true);
+                requestNewestTopicInfo(true);
             }
         });
     }
@@ -53,16 +59,24 @@ public class NewestFragment extends BaseFragment {
     @Override
     protected void doOnActivityCreated() {
         Log.d(TAG, "onActivityCreated() ...");
+        mTopics = new ArrayList<>();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mRefreshLayout.setRefreshing(true);
-                requestNewestTopicInfo();
+                requestNewestTopicInfo(false);
             }
         }, 300);
     }
 
-    private void requestNewestTopicInfo() {
+    private void requestNewestTopicInfo(boolean force) {
+
+        String filepath = mContext.getFilesDir().getPath() + File.separator + Constants.FILE_NEWEST_TOPICS_LIST;
+        if(!force && FileUtil.checkFileExist(filepath)){
+            List<TopicItem> data = (List<TopicItem>) FileUtil.readObject(mContext, Constants.FILE_NEWEST_TOPICS_LIST);
+            mAdapter.update(data, false);
+            return;
+        }
+
         if (NetWorkUtil.isConnected()) {
             OkHttpHelper.get(V2exManager.getNewestTopicUrl(), new NewestRequestCallBack(mHandler));
         }else {
@@ -81,24 +95,46 @@ public class NewestFragment extends BaseFragment {
         @Override
         public List<TopicItem> parseResultToList(String result) {
             Gson gson = new Gson();
-            return gson.fromJson(result, new TypeToken<List<TopicItem>>(){}.getType());
+            List<TopicItem> data = gson.fromJson(result, new TypeToken<List<TopicItem>>(){}.getType());
+            int count = updateList(data);
+            FileUtil.write(mContext, Constants.FILE_NEWEST_TOPICS_LIST,  data);
+            return mTopics;
         }
 
         @Override
         public void onResponseFailure(String error) {
-            // TODO: 显示请求异常信息或者显示已经缓存的条目
             mRefreshLayout.setRefreshing(false);
         }
 
         @Override
         public void onResponseSuccess(List<TopicItem> data) {
-            Log.d(TAG, "onResponse, run in thread : "+
-                    Thread.currentThread().getName() + "-" + Thread.currentThread().getId());
-            // 刷新后可能还有新增的话题，所以应该做对比，新增加的item追加到列表中
-            mAdapter.update(data, true);
+            mAdapter.update(data, false);
             mRefreshLayout.setRefreshing(false);
         }
     }
 
+    private int updateList(List<TopicItem> data) {
+        if(data == null || data.size() == 0){
+            return 0;
+        }
+        int count = 0;
+        if (mTopics.size() > 0) {
+            for(int i = 0 ; i < mTopics.size(); i++) {
+                TopicItem item = mTopics.get(i);
+                boolean exist = false;
+                for(int j = 0; j < data.size(); j++) {
+                    if (item.getId() == data.get(j).getId()) {
+                        exist = true;
+                        break;
+                    }
+                }
+                if(exist) continue;
+                count++;
+                data.add(item);
+            }
+        }
+        mTopics = data;
+        return count;
+    }
 
 }

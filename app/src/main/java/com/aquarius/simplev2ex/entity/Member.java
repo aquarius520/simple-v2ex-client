@@ -3,11 +3,15 @@ package com.aquarius.simplev2ex.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * Created by aquarius on 2017/8/7.
  * 用户信息
  */
-public class Member implements Parcelable{
+public class Member implements Parcelable, Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     private int id ;                // 用户id
     private String username;        // 用户名

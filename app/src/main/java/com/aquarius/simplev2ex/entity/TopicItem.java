@@ -5,11 +5,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.webkit.JavascriptInterface;
 
+import java.io.Serializable;
+
 /**
  * Created by aquarius on 2017/8/7.
  * 热门话题
  */
-public class TopicItem implements Parcelable{
+public class TopicItem implements Parcelable, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int id;             // 话题id
     private String title;       // 话题标题
     private String url;
