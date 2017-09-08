@@ -135,7 +135,7 @@ public class UserHomepageActivity extends Activity {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestUserInfo();
+                requestUserInfo(true);
             }
         });
 
@@ -147,12 +147,11 @@ public class UserHomepageActivity extends Activity {
 
 
     private void requestData() {
-        refreshLayout.setRefreshing(true);
-        requestUserInfo();
+        requestUserInfo(false);
     }
 
-    private void requestUserInfo() {
-
+    private void requestUserInfo(boolean force) {
+        refreshLayout.setRefreshing(force);
         // 查询member信息
         Member member = DataBaseManager.init().queryMember(username);
 
@@ -167,12 +166,12 @@ public class UserHomepageActivity extends Activity {
         }
 
         mTopics = DataBaseManager.init().queryTopicByMember(username);
-        if (mTopics != null && mTopics.size() > 0) {
-            topicListAdapter.update(mTopics, true);
+        if (!force && mTopics != null && mTopics.size() > 0) {
+            topicListAdapter.update(mTopics, false);
             refreshLayout.setRefreshing(false);
             isMemberTopicExist = true;
         } else if (NetWorkUtil.isConnected()) {
-            if(!isMemberTopicExist) OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(handler));
+            OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(handler));
         } else {
             refreshLayout.setRefreshing(false);
             MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),
@@ -261,13 +260,23 @@ public class UserHomepageActivity extends Activity {
 
         @Override
         public void onResponseSuccess(List<TopicItem> data) {
+            TopicItem emptyItem = null;
+            TopicItem headerItem = null;
             if (data == null || data.size() == 0) {
+                emptyItem = new TopicItem.Builder(0, "empty").build();
                 data = new ArrayList<TopicItem>(2);
-                data.add(new TopicItem.Builder(0, "empty").build());
+                data.add(emptyItem);
             }
-            data.add(0, new TopicItem.Builder(0, "header").build());
+            headerItem = new TopicItem.Builder(0, "header").build();
+            data.add(0, headerItem);
             topicListAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
+
+            if (emptyItem != null) return;
+
+            data.remove(headerItem);
+
+            if(data.size() == 0) return;
 
             Intent intent = new Intent(UserHomepageActivity.this, DataService.class);
             Bundle bundle = new Bundle();

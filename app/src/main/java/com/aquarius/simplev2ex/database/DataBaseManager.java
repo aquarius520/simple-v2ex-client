@@ -367,8 +367,9 @@ public class DataBaseManager {
     }
 
     public synchronized Member queryMember(String name) {
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
+            db = databaseHelper.getWritableDatabase();
             if (db != null) {
                 String sql = "SELECT * FROM " + DatabaseHelper.TABLE_MEMBER_NAME + " WHERE " + DatabaseHelper.MEMBER_NAME +
                         "=?";
