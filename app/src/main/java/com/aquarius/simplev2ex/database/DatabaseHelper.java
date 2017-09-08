@@ -123,7 +123,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             NODE_HEADER + " TEXT," +
             NODE_FOOTER + " TEXT," +
             NODE_CREATED + " TEXT" +
-
             " ); ";
 
 

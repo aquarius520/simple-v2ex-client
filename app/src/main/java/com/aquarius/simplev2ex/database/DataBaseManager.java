@@ -26,9 +26,6 @@ public class DataBaseManager {
     private static DataBaseManager manager;
     private DatabaseHelper databaseHelper;
 
-    private static final String SQL_QUERY_NODE = "SELECT * FROM " + DatabaseHelper.TABLE_NODE_NAME
-            + " WHERE " + DatabaseHelper.NODE_ID + "=?";
-
     private DataBaseManager(){
         // TODO: for debug db file
         databaseHelper = new DatabaseHelper(V2exApplication.getInstance(), true);
@@ -44,54 +41,6 @@ public class DataBaseManager {
         }
         return manager;
     }
-
-    public boolean insertNode(Node node) {
-        if(node == null) return false ;
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        long count = 0;
-        Cursor cursor = null;
-        try {
-            if (db != null) {
-                cursor = db.rawQuery(SQL_QUERY_NODE, new String[]{ node.getId() + "" });
-                boolean existed = cursor != null && cursor.getCount() > 0;
-                if (!existed) {
-                    count = db.insert(DatabaseHelper.TABLE_NODE_NAME, null, generateNodeParams(node));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if(cursor != null) cursor.close();
-            if(db != null) db.close();
-        }
-        return count > 0;
-    }
-
-//    public boolean insertNodes(List<Node> nodes) {
-//        if(nodes == null || nodes.size() == 0) return false;
-//        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-//        long count = 0;
-//        try {
-//            if (db != null) {
-//                // 开启事务
-//                db.beginTransaction();
-//                for (Node node : nodes) {
-//                    db.insert(DatabaseHelper.TABLE_NODE_NAME, null, generateNodeParams(node));
-//                    count++;
-//                }
-//                db.setTransactionSuccessful();
-//                db.endTransaction();
-//                db.close();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        } finally {
-//            if(db != null) db.close();
-//        }
-//        return count > 0;
-//    }
 
     public <T> boolean insertList(List<T> list, String type, int extra) {
         if(list == null || list.size() == 0) return false;
@@ -130,22 +79,6 @@ public class DataBaseManager {
         return count > 0;
     }
 
-    public boolean updateNode(int topicId, ContentValues values) {
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        int count = 0;
-        try {
-            if (db != null) {
-                count = db.update(DatabaseHelper.TABLE_NODE_NAME, values, "id=?", new String[]{topicId + ""});
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if(db != null) db.close();
-        }
-        return count > 0;
-    }
-
     public boolean handleTopicConflict(SQLiteDatabase db , TopicItem topic , int extra) {
         boolean need = false;
         int topicId = topic.getId();
@@ -170,7 +103,7 @@ public class DataBaseManager {
                     " = ? ";
             cursor = db.rawQuery(sql, new String[]{member.getUsername()});
         }
-        return cursor !=null && cursor.getCount() > 0;
+        return cursor != null && cursor.getCount() > 0;
     }
 
     public boolean handleReplyConflict(SQLiteDatabase db, Reply reply, int extra) {
@@ -180,7 +113,7 @@ public class DataBaseManager {
                     " = ? ";
             cursor = db.rawQuery(sql, new String[]{reply.getId()+""});
         }
-        return cursor !=null && cursor.getCount() > 0;
+        return cursor != null && cursor.getCount() > 0;
     }
 
     public Cursor queryTopic(SQLiteDatabase db, int topicId) {
@@ -201,134 +134,28 @@ public class DataBaseManager {
         return queryTopics(nodeName, "node", true);
     }
 
-    public List<TopicItem> queryTopicsByCategory(String category) {
+    public List<TopicItem> queryTopicByCategory(String category) {
         return queryTopics(category, "category", false);
-    }
-
-
-    //TODO: 仅显示结果集中最后一天之内的话题
-    public List<TopicItem> queryTopics(String key, String type,  boolean wholeMatch) {
-        List<TopicItem> topics = new ArrayList<>();
-        if (TextUtils.isEmpty(key)) {
-            return topics;
-        }
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        try {
-            if (db != null) {
-                String selection = "";
-                if (type.equals("category")) {
-                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_TYPE_FLAG +" LIKE ? ";
-                }
-                else if (type.equals("node")) {
-                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME + "= ?";
-                } else if (type.equals("member")) {
-                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME + "= ?";
-                }
-                StringBuilder sb = new StringBuilder();
-                sb.append("SELECT ")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_ID + ",")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_TITLE + ",")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_URL + ",")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CONTENT_RENDERED + ",")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_REPLIES + ",")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CREATED + ",")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME + ",")
-                        .append(DatabaseHelper.TABLE_MEMBER_NAME + "." + DatabaseHelper.MEMBER_AVATAR_NORMAL + ",")
-                        .append(DatabaseHelper.TABLE_MEMBER_NAME + "." + DatabaseHelper.MEMBER_AVATAR_LARGE + ",")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME + ",")
-                        .append(DatabaseHelper.TABLE_NODE_NAME + "." + DatabaseHelper.NODE_TITLE)
-                        .append(" FROM ")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME)
-                        .append(" INNER JOIN ")
-                        .append(DatabaseHelper.TABLE_MEMBER_NAME)
-                        .append(" ON " + selection)
-                        .append(" AND ")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME)
-                        .append("=")
-                        .append(DatabaseHelper.TABLE_MEMBER_NAME+"." + DatabaseHelper.MEMBER_NAME)
-                        .append(" INNER JOIN ")
-                        .append(DatabaseHelper.TABLE_NODE_NAME)
-                        .append(" ON ")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME)
-                        .append("=")
-                        .append(DatabaseHelper.TABLE_NODE_NAME + "." + DatabaseHelper.NODE_NAME)
-                        .append(" ORDER BY ")
-                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CREATED + " DESC ");
-                Cursor cursor = db.rawQuery(sb.toString(), new String[]{wholeMatch ? key : "%" + key + "%"});
-                while (cursor.moveToNext()) {
-                    int topicId = cursor.getInt(0);
-                    String topicTitle = cursor.getString(1);
-                    String topicUrl = cursor.getString(2);
-                    String topicContent = cursor.getString(3);
-                    int replies = cursor.getInt(4);
-                    long topicCreated = cursor.getLong(5);
-
-                    String memberName = cursor.getString(6);
-                    String avatarNormal = cursor.getString(7);
-                    String avatarLarge = cursor.getString(8);
-
-                    String nodeName = cursor.getString(9);
-                    String nodeTitle = cursor.getString(10);
-
-                    Member m = new Member.Builder(memberName).setAvatarNormal(avatarNormal)
-                            .setAvatarLarge(avatarLarge).build();
-
-                    Node node = new Node.Builder(nodeName, nodeTitle).build();
-
-                    TopicItem topic = new TopicItem.Builder(topicId, topicTitle).url(topicUrl).replies(replies)
-                            .content_rendered(topicContent).created(topicCreated).member(m).node(node).build();
-
-                    topics.add(topic);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return topics;
-        } finally {
-            if(db != null) db.close();
-        }
-
-        return topics;
     }
 
     public boolean updateTopic(int topicId, TopicItem topic) {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.TOPIC_CONTENT, topic.getContent());
         values.put(DatabaseHelper.TOPIC_CONTENT_RENDERED, topic.getContent_rendered());
-
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        int count = 0;
-        try {
-            if (db != null) {
-                count = db.update(DatabaseHelper.TABLE_TOPIC_NAME, values, DatabaseHelper.TOPIC_ID + "=?", new String[]{topicId + ""});
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (db != null) db.close();
-        }
-        return count > 0;
+        boolean affected = updateTopic(db, topicId, values);
+        if (db != null) db.close();
+        return affected;
     }
 
     // 更新topic回复数
     public boolean updateTopicReplyCount(int topicId, int replyCount) {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.TOPIC_REPLIES, replyCount);
-
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        int count = 0;
-        try {
-            if (db != null) {
-                count = db.update(DatabaseHelper.TABLE_TOPIC_NAME, values, DatabaseHelper.TOPIC_ID + "=?", new String[]{topicId + ""});
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (db != null) db.close();
-        }
-        return count > 0;
+        boolean affected = updateTopic(db, topicId, values);
+        if (db != null) db.close();
+        return affected;
     }
 
     public boolean updateTopic(SQLiteDatabase db, int topicId, ContentValues values) {
@@ -415,11 +242,98 @@ public class DataBaseManager {
         } catch (Exception e) {
             e.printStackTrace();
             return nodes;
-
         } finally {
             if(db != null) db.close();
         }
         return nodes;
+    }
+
+    /**
+     * @param key   查询关键字
+     * @param type  表
+     * @param wholeMatch 是否完整匹配
+     */
+    //TODO: 仅显示结果集中最后一天之内的话题
+    public List<TopicItem> queryTopics(String key, String type,  boolean wholeMatch) {
+        List<TopicItem> topics = new ArrayList<>();
+        if (TextUtils.isEmpty(key)) {
+            return topics;
+        }
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        try {
+            if (db != null) {
+                String selection = "";
+                if (type.equals("category")) {
+                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_TYPE_FLAG +" LIKE ? ";
+                }
+                else if (type.equals("node")) {
+                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME + "= ?";
+                } else if (type.equals("member")) {
+                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME + "= ?";
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("SELECT ")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_ID + ",")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_TITLE + ",")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_URL + ",")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CONTENT_RENDERED + ",")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_REPLIES + ",")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CREATED + ",")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME + ",")
+                        .append(DatabaseHelper.TABLE_MEMBER_NAME + "." + DatabaseHelper.MEMBER_AVATAR_NORMAL + ",")
+                        .append(DatabaseHelper.TABLE_MEMBER_NAME + "." + DatabaseHelper.MEMBER_AVATAR_LARGE + ",")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME + ",")
+                        .append(DatabaseHelper.TABLE_NODE_NAME + "." + DatabaseHelper.NODE_TITLE)
+                        .append(" FROM ")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME)
+                        .append(" INNER JOIN ")
+                        .append(DatabaseHelper.TABLE_MEMBER_NAME)
+                        .append(" ON " + selection)
+                        .append(" AND ")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME)
+                        .append("=")
+                        .append(DatabaseHelper.TABLE_MEMBER_NAME+"." + DatabaseHelper.MEMBER_NAME)
+                        .append(" INNER JOIN ")
+                        .append(DatabaseHelper.TABLE_NODE_NAME)
+                        .append(" ON ")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME)
+                        .append("=")
+                        .append(DatabaseHelper.TABLE_NODE_NAME + "." + DatabaseHelper.NODE_NAME)
+                        .append(" ORDER BY ")
+                        .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CREATED + " DESC ");
+                Cursor cursor = db.rawQuery(sb.toString(), new String[]{wholeMatch ? key : "%" + key + "%"});
+                while (cursor.moveToNext()) {
+                    int topicId = cursor.getInt(0);
+                    String topicTitle = cursor.getString(1);
+                    String topicUrl = cursor.getString(2);
+                    String topicContent = cursor.getString(3);
+                    int replies = cursor.getInt(4);
+                    long topicCreated = cursor.getLong(5);
+
+                    String memberName = cursor.getString(6);
+                    String avatarNormal = cursor.getString(7);
+                    String avatarLarge = cursor.getString(8);
+
+                    String nodeName = cursor.getString(9);
+                    String nodeTitle = cursor.getString(10);
+
+                    Member m = new Member.Builder(memberName).setAvatarNormal(avatarNormal)
+                            .setAvatarLarge(avatarLarge).build();
+                    Node node = new Node.Builder(nodeName, nodeTitle).build();
+
+                    TopicItem topic = new TopicItem.Builder(topicId, topicTitle).url(topicUrl).replies(replies)
+                            .content_rendered(topicContent).created(topicCreated).member(m).node(node).build();
+
+                    topics.add(topic);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return topics;
+        } finally {
+            if(db != null) db.close();
+        }
+        return topics;
     }
 
     public List<Reply> queryReplies(int topicId) {
@@ -475,7 +389,6 @@ public class DataBaseManager {
     }
 
     private String table(String type) {
-
         if (type.equals("topics") || type.equals("topic")) {
             return DatabaseHelper.TABLE_TOPIC_NAME;
         }
@@ -491,7 +404,6 @@ public class DataBaseManager {
         if (type.equals("nodes") || type.equals("node")) {
             return DatabaseHelper.TABLE_NODE_NAME;
         }
-
         return null;
     }
 
@@ -570,5 +482,4 @@ public class DataBaseManager {
         cv.put(DatabaseHelper.NODE_TOPICS, node.getTopics());
         return cv;
     }
-
 }

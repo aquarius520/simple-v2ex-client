@@ -26,7 +26,6 @@ import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -64,7 +63,7 @@ public class TopicListPagerAdapter extends PagerAdapter {
             }
         });
 
-        List<TopicItem> topics = DataBaseManager.init().queryTopicsByCategory(Constants.CATEGORY_TYPES[position]);
+        List<TopicItem> topics = DataBaseManager.init().queryTopicByCategory(Constants.CATEGORY_TYPES[position]);
         if (topics != null && topics.size() > 0) {
             adapter.update(topics, true);
 //            mTopicCache.put(position, topics);
