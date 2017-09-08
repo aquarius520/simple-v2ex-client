@@ -186,7 +186,7 @@ public class TopicDetailActivity extends Activity {
             @Override
             public void onRefresh() {
                 boolean connect = whetherNetworkConnected();
-                if(connect) requestRepliesInfo();
+                if(connect) requestRepliesInfo(true);
             }
         });
 
@@ -211,18 +211,17 @@ public class TopicDetailActivity extends Activity {
 
     private void requestData() {
         refreshLayout.setRefreshing(true);
-        requestRepliesInfo();
+        requestRepliesInfo(false);
     }
 
-    private void requestRepliesInfo() {
+    private void requestRepliesInfo(boolean force) {
         // 1.读取数据库记录 有数据先展示
         mReplies = DataBaseManager.init().queryReplies(topicId);
         mReplyCount = mReplies.size();
-        if (mReplyCount > 0) {
+        if (!force && mReplyCount > 0) {
             mRepliesAdapter.update(mReplies, true);
             refreshLayout.setRefreshing(false);
         }
-
         // 2.请求网络，获取最新的回复列表
         else if (NetWorkUtil.isConnected()) {
             if (TextUtils.isEmpty(topicContent)) {
@@ -307,8 +306,6 @@ public class TopicDetailActivity extends Activity {
         public void onResponseSuccess(List<Reply> data) {
             mRepliesAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
-
-
 
 //            int newCount = 0;
 //            ArrayList<Reply> newUpdateList = new ArrayList<>();
