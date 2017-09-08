@@ -32,7 +32,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NodeTopicsActivity" android:screenOrientation="portrait">
+        <activity android:name=".NodeTopicsActivity" android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            >
         </activity>
 
         <service android:name=".core.DataService"/>

@@ -27,8 +27,8 @@ public class TimeUtil {
         return text;
     }
 
-    public static CharSequence replyCreatedTime(Context context, long createtTime) {
-        return topicCreatedTime(context, createtTime);
+    public static CharSequence replyCreatedTime(Context context, long createdtTime) {
+        return topicCreatedTime(context, createdtTime);
     }
 
 }

@@ -14,17 +14,22 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.aquarius.simplev2ex.adapter.TopicListAdapter;
+import com.aquarius.simplev2ex.core.DataService;
 import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
+import com.aquarius.simplev2ex.database.DataBaseManager;
 import com.aquarius.simplev2ex.entity.Node;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.support.ItemAnimationUtil;
+import com.aquarius.simplev2ex.util.Constants;
+import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,6 +49,7 @@ public class NodeTopicsActivity extends Activity {
 
     private TopicListAdapter topicListAdapter;
 
+    private List<TopicItem> mTopics;
     private Handler handler = new Handler();
 
     @Override
@@ -68,6 +74,14 @@ public class NodeTopicsActivity extends Activity {
         requestData();
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Node node = intent.getExtras().getParcelable("node");
+        String title = node.getTitle();
+        MessageUtil.showMessageBar(this, "当前界面就是" + "["+ title + "]" + "节点话题列表, 无需跳转", "知道了");
+    }
+
+
     private void initViews() {
         titleTopBar = (TitleTopBar) findViewById(R.id.topBarTitle);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.node_topics_srl);
@@ -79,7 +93,6 @@ public class NodeTopicsActivity extends Activity {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutAnimation(ItemAnimationUtil.getLac(context,R.anim.alpha, 0f));
-        // recyclerView.setScrollingTouchSlop(ViewConfiguration.get(context).getScaledTouchSlop());
     }
 
     private void bindDataAndSetListeners() {
@@ -110,12 +123,23 @@ public class NodeTopicsActivity extends Activity {
     }
 
     private void requestTopicsInfo() {
-        if (NetWorkUtil.isConnected()) {
+        // 根据节名首先从topic表中查询
+        mTopics = DataBaseManager.init().queryTopicByNode(nodeName);
+        if (mTopics.size() > 0) {
+            topicListAdapter.update(mTopics, true);
+            refreshLayout.setRefreshing(false);
+        }
+        // 如果没有数据，则联网查询一次
+        else if (NetWorkUtil.isConnected()) {
             if (nodeId != 0) {
                 OkHttpHelper.get(V2exManager.getTopicsOfNodeUrl(nodeId), new NodeTopicsRequest(handler));
             } else if (!TextUtils.isEmpty(nodeName)) {
                 OkHttpHelper.get(V2exManager.getTopicsOfNodeUrl(nodeName), new NodeTopicsRequest(handler));
             }
+        }else {
+            refreshLayout.setRefreshing(false);
+            MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),
+                    this.getResources().getString(R.string.network_error_label));
         }
     }
 
@@ -140,6 +164,14 @@ public class NodeTopicsActivity extends Activity {
         public void onResponseSuccess(List<TopicItem> data) {
             topicListAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
+
+            Intent intent = new Intent(refreshLayout.getContext(), DataService.class);
+            Bundle bundle = new Bundle();
+            intent.putExtra(Constants.DATA_SOURCE, "topics");
+            intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
+            bundle.putParcelableArrayList("topics", (ArrayList) data);
+            intent.putExtras(bundle);
+            refreshLayout.getContext().startService(intent);
         }
     }
 

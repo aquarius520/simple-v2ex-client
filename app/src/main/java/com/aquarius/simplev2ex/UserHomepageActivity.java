@@ -18,15 +18,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aquarius.simplev2ex.adapter.TopicListAdapter;
+import com.aquarius.simplev2ex.core.DataService;
 import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
+import com.aquarius.simplev2ex.database.DataBaseManager;
 import com.aquarius.simplev2ex.entity.Member;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.entity.V2exUser;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.support.HeaderViewRecyclerAdapter;
 import com.aquarius.simplev2ex.support.ItemAnimationUtil;
+import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.GlideUtil;
+import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 import com.google.gson.Gson;
@@ -60,6 +64,11 @@ public class UserHomepageActivity extends Activity {
     private String userBio;
     private long created;
 
+    private boolean isMemberWholeExist;
+    private boolean isMemberTopicExist;
+
+    private List<TopicItem> mTopics;
+
     private Handler handler = new Handler();
 
     @Override
@@ -88,6 +97,8 @@ public class UserHomepageActivity extends Activity {
         bindDataAndSetListeners();
         requestData();
     }
+
+
 
     private void initViews() {
         titleTopBar = (TitleTopBar) findViewById(R.id.topBarTitle);
@@ -142,9 +153,32 @@ public class UserHomepageActivity extends Activity {
     }
 
     private void requestUserInfo() {
-        if (NetWorkUtil.isConnected()) {
-            OkHttpHelper.get(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(handler));
-            OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(handler));
+
+        // 查询member信息
+        Member member = DataBaseManager.init().queryMember(username);
+
+        if (member != null && member.getId() != 0) {
+            int id = member.getId();
+            String bio = member.getBio();
+            long created = member.getCreated();
+            updateUserPanelInfo(id, bio, created);
+            if (created > 0) {
+                isMemberWholeExist = true;
+            }
+        }
+
+        mTopics = DataBaseManager.init().queryTopicByMember(username);
+        if (mTopics != null && mTopics.size() > 0) {
+            topicListAdapter.update(mTopics, true);
+            refreshLayout.setRefreshing(false);
+            isMemberTopicExist = true;
+        } else if (NetWorkUtil.isConnected()) {
+            if(!isMemberWholeExist) OkHttpHelper.get(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(handler));
+            if(!isMemberTopicExist) OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(handler));
+        } else {
+            refreshLayout.setRefreshing(false);
+            MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),
+                    this.getResources().getString(R.string.network_error_label));
         }
     }
 
@@ -192,15 +226,20 @@ public class UserHomepageActivity extends Activity {
                 userId = user.getId();
                 userBio = user.getBio();
                 created = user.getCreated();
-                userIdTv.setText(UserHomepageActivity.this.getResources().getString(R.string.user_id_format, userId));
-                userBioTv.setText(userBio);
-                createdTv.setText(
-                        UserHomepageActivity.this.getResources().getString(R.string.register_date,
-                                DateUtils.formatDateTime(UserHomepageActivity.this,
-                                created * 1000,
-                                DateUtils.FORMAT_SHOW_YEAR))
-                );
+                updateUserPanelInfo(userId, userBio, created);
                 refreshLayout.setRefreshing(false);
+
+                Member member = new Member.Builder(username).setId(userId).setBio(userBio).created(created)
+                        .setAvatarLarge(user.getAvatar_large()).build();
+
+                // 更新member信息
+                Intent intent = new Intent(UserHomepageActivity.this, DataService.class);
+                Bundle bundle = new Bundle();
+                intent.putExtra(Constants.DATA_SOURCE, "member");
+                intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_UPDATE);
+                bundle.putParcelable("member", member);
+                intent.putExtras(bundle);
+                UserHomepageActivity.this.startService(intent);
             }
         }
     }
@@ -232,14 +271,31 @@ public class UserHomepageActivity extends Activity {
             topicListAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
 
-
+            Intent intent = new Intent(UserHomepageActivity.this, DataService.class);
+            Bundle bundle = new Bundle();
+            intent.putExtra(Constants.DATA_SOURCE, "topics");
+            intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
+            bundle.putParcelableArrayList("topics", (ArrayList) data);
+            intent.putExtras(bundle);
+            UserHomepageActivity.this.startService(intent);
         }
+    }
+
+    private void updateUserPanelInfo(int userId, String userBio, long created) {
+        userIdTv.setText(UserHomepageActivity.this.getResources().getString(R.string.user_id_format, userId));
+        userBioTv.setText(userBio);
+        if(created == 0) return;
+        createdTv.setText(
+                UserHomepageActivity.this.getResources().getString(R.string.register_date,
+                        DateUtils.formatDateTime(UserHomepageActivity.this,
+                                created * 1000,
+                                DateUtils.FORMAT_SHOW_YEAR))
+        );
     }
 
     protected void initDefaultRecyclerViewConfig(Context context, RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutAnimation(ItemAnimationUtil.getLac(context, R.anim.alpha, 0f));
-        // recyclerView.setScrollingTouchSlop(ViewConfiguration.get(context).getScaledTouchSlop());
     }
 }

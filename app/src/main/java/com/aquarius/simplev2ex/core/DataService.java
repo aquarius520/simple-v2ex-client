@@ -48,9 +48,9 @@ public class DataService extends IntentService {
                     DataBaseManager.init().insertList(list, "members", 0);
                 }
             }
-
-            if (source.equals("replies")) {
+            else if (source.equals("replies")) {
                 ArrayList<Reply> replies = intent.getExtras().getParcelableArrayList("replies");
+                int replyCount = replies.size();
                 int topicId = intent.getIntExtra(Constants.TOPIC_ID, 0);
                boolean succeed = DataBaseManager.init().insertList(replies, "replies", topicId);
 
@@ -64,15 +64,17 @@ public class DataService extends IntentService {
                 if (members.size() > 0) {
                     DataBaseManager.init().insertList(list, "members", 0);
                 }
-            }
 
-            if (source.equals("nodes")) {
+                if (replyCount > 0) {
+                    DataBaseManager.init().updateTopicReplyCount(topicId, replyCount);
+                }
+            }
+            else if (source.equals("nodes")) {
                 ArrayList<Node> nodes = intent.getExtras().getParcelableArrayList("nodes");
                 DataBaseManager.init().insertList(nodes, "nodes", 0);
             }
         }
-
-        if (action.equals(Constants.ACTION_UPDATE)) {
+        else if (action.equals(Constants.ACTION_UPDATE)) {
             if (source.equals("topic")) {
                 TopicItem topic = intent.getExtras().getParcelable("topic");
                 int topicId = intent.getIntExtra(Constants.TOPIC_ID, 0);
@@ -82,6 +84,10 @@ public class DataService extends IntentService {
                     Member member = topic.getMember();
                     DataBaseManager.init().updateMember(member, member.getUsername());
                 }
+            }
+            else if (source.equals("member")) {
+                Member member = intent.getExtras().getParcelable("member");
+                DataBaseManager.init().updateMember(member, member.getUsername());
             }
         }
     }

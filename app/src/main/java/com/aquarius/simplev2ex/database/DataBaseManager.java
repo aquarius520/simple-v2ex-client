@@ -193,16 +193,37 @@ public class DataBaseManager {
         return cursor;
     }
 
-    //TODO: 仅显示结果集中最后一天的话题
+    public List<TopicItem> queryTopicByMember(String memberName) {
+        return queryTopics(memberName, "member", true);
+    }
+
+    public List<TopicItem> queryTopicByNode(String nodeName) {
+        return queryTopics(nodeName, "node", true);
+    }
+
     public List<TopicItem> queryTopicsByCategory(String category) {
+        return queryTopics(category, "category", false);
+    }
+
+
+    //TODO: 仅显示结果集中最后一天之内的话题
+    public List<TopicItem> queryTopics(String key, String type,  boolean wholeMatch) {
         List<TopicItem> topics = new ArrayList<>();
-        if (TextUtils.isEmpty(category)) {
+        if (TextUtils.isEmpty(key)) {
             return topics;
         }
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         try {
             if (db != null) {
-
+                String selection = "";
+                if (type.equals("category")) {
+                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_TYPE_FLAG +" LIKE ? ";
+                }
+                else if (type.equals("node")) {
+                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME + "= ?";
+                } else if (type.equals("member")) {
+                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME + "= ?";
+                }
                 StringBuilder sb = new StringBuilder();
                 sb.append("SELECT ")
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_ID + ",")
@@ -211,19 +232,16 @@ public class DataBaseManager {
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CONTENT_RENDERED + ",")
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_REPLIES + ",")
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CREATED + ",")
-
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME + ",")
                         .append(DatabaseHelper.TABLE_MEMBER_NAME + "." + DatabaseHelper.MEMBER_AVATAR_NORMAL + ",")
                         .append(DatabaseHelper.TABLE_MEMBER_NAME + "." + DatabaseHelper.MEMBER_AVATAR_LARGE + ",")
-
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME + ",")
                         .append(DatabaseHelper.TABLE_NODE_NAME + "." + DatabaseHelper.NODE_TITLE)
-
                         .append(" FROM ")
                         .append(DatabaseHelper.TABLE_TOPIC_NAME)
                         .append(" INNER JOIN ")
                         .append(DatabaseHelper.TABLE_MEMBER_NAME)
-                        .append(" ON " + DatabaseHelper.TOPIC_TYPE_FLAG +" LIKE ? ")
+                        .append(" ON " + selection)
                         .append(" AND ")
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME)
                         .append("=")
@@ -236,7 +254,7 @@ public class DataBaseManager {
                         .append(DatabaseHelper.TABLE_NODE_NAME + "." + DatabaseHelper.NODE_NAME)
                         .append(" ORDER BY ")
                         .append(DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_CREATED + " DESC ");
-                Cursor cursor = db.rawQuery(sb.toString(), new String[]{"%" + category + "%"});
+                Cursor cursor = db.rawQuery(sb.toString(), new String[]{wholeMatch ? key : "%" + key + "%"});
                 while (cursor.moveToNext()) {
                     int topicId = cursor.getInt(0);
                     String topicTitle = cursor.getString(1);
@@ -293,6 +311,26 @@ public class DataBaseManager {
         return count > 0;
     }
 
+    // 更新topic回复数
+    public boolean updateTopicReplyCount(int topicId, int replyCount) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.TOPIC_REPLIES, replyCount);
+
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        int count = 0;
+        try {
+            if (db != null) {
+                count = db.update(DatabaseHelper.TABLE_TOPIC_NAME, values, DatabaseHelper.TOPIC_ID + "=?", new String[]{topicId + ""});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (db != null) db.close();
+        }
+        return count > 0;
+    }
+
     public boolean updateTopic(SQLiteDatabase db, int topicId, ContentValues values) {
         int count = 0;
         try {
@@ -326,6 +364,32 @@ public class DataBaseManager {
             if (db != null) db.close();
         }
         return count > 0;
+    }
+
+    public synchronized Member queryMember(String name) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        try {
+            if (db != null) {
+                String sql = "SELECT * FROM " + DatabaseHelper.TABLE_MEMBER_NAME + " WHERE " + DatabaseHelper.MEMBER_NAME +
+                        "=?";
+                Cursor cursor = db.rawQuery(sql, new String[]{name});
+                if (cursor.moveToFirst()) {
+                    int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.MEMBER_ID));
+                    String username = cursor.getString(cursor.getColumnIndex(DatabaseHelper.MEMBER_NAME));
+                    String bio = cursor.getString(cursor.getColumnIndex(DatabaseHelper.MEMBER_BIO));
+                    long created = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.MEMBER_CREATED));
+                    String avatarLarge = cursor.getString(cursor.getColumnIndex(DatabaseHelper.MEMBER_AVATAR_LARGE));
+                    return new Member.Builder(username).setId(id).setBio(bio).setAvatarLarge(avatarLarge)
+                            .created(created).build();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (db != null) db.close();
+        }
+        return null;
     }
 
     public List<Node> queryNodes(String key) {
@@ -403,6 +467,8 @@ public class DataBaseManager {
         } catch (Exception e) {
             e.printStackTrace();
             return replies;
+        } finally {
+            if(db != null) db.close();
         }
         return replies;
     }

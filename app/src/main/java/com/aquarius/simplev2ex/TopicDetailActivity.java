@@ -76,6 +76,7 @@ public class TopicDetailActivity extends Activity {
     private Node node;
 
     private List<Reply> mReplies;
+    private int mReplyCount;
 
     private Handler mHandler = new Handler();
 
@@ -184,7 +185,8 @@ public class TopicDetailActivity extends Activity {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestRepliesInfo();
+                boolean connect = whetherNetworkConnected();
+                if(connect) requestRepliesInfo();
             }
         });
 
@@ -215,14 +217,14 @@ public class TopicDetailActivity extends Activity {
     private void requestRepliesInfo() {
         // 1.读取数据库记录 有数据先展示
         mReplies = DataBaseManager.init().queryReplies(topicId);
-        if (mReplies.size() > 0) {
+        mReplyCount = mReplies.size();
+        if (mReplyCount > 0) {
             mRepliesAdapter.update(mReplies, true);
             refreshLayout.setRefreshing(false);
         }
 
         // 2.请求网络，获取最新的回复列表
-        if (NetWorkUtil.isConnected()) {
-
+        else if (NetWorkUtil.isConnected()) {
             if (TextUtils.isEmpty(topicContent)) {
                  OkHttpHelper.get(V2exManager.getTopicByTopicIdUrl(topicId), new TopicContentRequest(mHandler));
             }
@@ -232,6 +234,16 @@ public class TopicDetailActivity extends Activity {
             MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),
                     this.getResources().getString(R.string.network_error_label));
         }
+    }
+
+    private boolean whetherNetworkConnected() {
+        if (!NetWorkUtil.isConnected()) {
+            refreshLayout.setRefreshing(false);
+            MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),
+                    this.getResources().getString(R.string.network_error_label));
+            return false;
+        }
+        return true;
     }
 
 
@@ -296,27 +308,30 @@ public class TopicDetailActivity extends Activity {
             mRepliesAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
 
-            int newCount = 0;
-            ArrayList<Reply> newUpdateList = null;
-            if(data != null && data.size() > 0) {
-                newCount = updateCount(data);
-                mReplies = data;
-                if (newCount > 0) {
-                    newUpdateList.addAll(mReplies.subList(data.size() - newCount, data.size()));
-                }
+
+
+//            int newCount = 0;
+//            ArrayList<Reply> newUpdateList = new ArrayList<>();
+//            if(data != null && data.size() > 0) {
+//                mReplies = data;
+//                newCount = updateCount(data);
+//                if (newCount > 0) {
+//                    newUpdateList.addAll(mReplies.subList(data.size() - newCount, data.size()));
+//                }
+//            }
+            if (data != null && mReplyCount < data.size()) {
+                mReplyCount = data.size();
+                Intent intent = new Intent(TopicDetailActivity.this, DataService.class);
+                Bundle bundle = new Bundle();
+                intent.putExtra(Constants.DATA_SOURCE, "replies");
+                intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
+                intent.putExtra(Constants.TOPIC_ID, topicId);
+                bundle.putParcelableArrayList("replies", /*newUpdateList.size() > 0 ? newUpdateList :*/ (ArrayList) data);
+                intent.putExtras(bundle);
+                TopicDetailActivity.this.startService(intent);
             }
-
-            Intent intent = new Intent(TopicDetailActivity.this, DataService.class);
-            Bundle bundle = new Bundle();
-            intent.putExtra(Constants.DATA_SOURCE, "replies");
-            intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
-            intent.putExtra(Constants.TOPIC_ID, topicId);
-            bundle.putParcelableArrayList("replies", newUpdateList != null ? newUpdateList : (ArrayList) mReplies);
-            intent.putExtras(bundle);
-            TopicDetailActivity.this.startService(intent);
-
-            if(newCount > 0) {
-                Toast.makeText(TopicDetailActivity.this, "新增了" + newCount + " 条回复.", Toast.LENGTH_SHORT).show();
+            else {
+                MessageUtil.showMessageBar(TopicDetailActivity.this, "没有新的回复.", "");
             }
         }
     }
