@@ -97,7 +97,10 @@ public class UserHomepageActivity extends Activity {
         requestData();
     }
 
-
+    @Override
+    protected void onNewIntent(Intent intent) {
+        MessageUtil.showMessageBar(this, "当前界面就是" + "["+ username + "]" + "的主页, 无需跳转", "知道了");
+    }
 
     private void initViews() {
         titleTopBar = (TitleTopBar) findViewById(R.id.topBarTitle);

@@ -25,7 +25,8 @@
         <activity android:name=".TopicDetailActivity" android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".UserHomepageActivity" android:screenOrientation="portrait">
+        <activity android:name=".UserHomepageActivity" android:screenOrientation="portrait"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.user.homepage"/>
                 <category android:name="android.intent.category.DEFAULT"/>
