@@ -64,7 +64,6 @@ public class UserHomepageActivity extends Activity {
     private String userBio;
     private long created;
 
-    private boolean isMemberWholeExist;
     private boolean isMemberTopicExist;
 
     private List<TopicItem> mTopics;
@@ -157,14 +156,14 @@ public class UserHomepageActivity extends Activity {
         // 查询member信息
         Member member = DataBaseManager.init().queryMember(username);
 
-        if (member != null && member.getId() != 0) {
+        if (member != null && member.getId() != 0 && member.getCreated() > 0) {
             int id = member.getId();
             String bio = member.getBio();
             long created = member.getCreated();
             updateUserPanelInfo(id, bio, created);
-            if (created > 0) {
-                isMemberWholeExist = true;
-            }
+        }else{
+            if (NetWorkUtil.isConnected())
+                OkHttpHelper.get(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(handler));
         }
 
         mTopics = DataBaseManager.init().queryTopicByMember(username);
@@ -173,7 +172,6 @@ public class UserHomepageActivity extends Activity {
             refreshLayout.setRefreshing(false);
             isMemberTopicExist = true;
         } else if (NetWorkUtil.isConnected()) {
-            if(!isMemberWholeExist) OkHttpHelper.get(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(handler));
             if(!isMemberTopicExist) OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(handler));
         } else {
             refreshLayout.setRefreshing(false);
