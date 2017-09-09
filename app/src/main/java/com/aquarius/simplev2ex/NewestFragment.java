@@ -72,8 +72,8 @@ public class NewestFragment extends BaseFragment {
 
         String filepath = mContext.getFilesDir().getPath() + File.separator + Constants.FILE_NEWEST_TOPICS_LIST;
         if(!force && FileUtil.checkFileExist(filepath)){
-            List<TopicItem> data = (List<TopicItem>) FileUtil.readObject(mContext, Constants.FILE_NEWEST_TOPICS_LIST);
-            mAdapter.update(data, false);
+            mTopics = (List<TopicItem>) FileUtil.readObject(mContext, Constants.FILE_NEWEST_TOPICS_LIST);
+            mAdapter.update(mTopics, false);
             return;
         }
 
@@ -98,7 +98,7 @@ public class NewestFragment extends BaseFragment {
             List<TopicItem> data = gson.fromJson(result, new TypeToken<List<TopicItem>>(){}.getType());
             int count = updateList(data);
             FileUtil.write(mContext, Constants.FILE_NEWEST_TOPICS_LIST,  data);
-            return mTopics;
+            return data;
         }
 
         @Override

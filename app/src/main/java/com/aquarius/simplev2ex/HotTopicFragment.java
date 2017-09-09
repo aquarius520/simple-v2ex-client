@@ -72,8 +72,8 @@ public class HotTopicFragment extends BaseFragment {
         // 1. 因为热议话题有接口，较解析网页返回数据完整，这里使用反序列化读取
         String filepath = mContext.getFilesDir().getPath() + File.separator + Constants.FILE_HOT_TOPICS_LIST;
         if(!force && FileUtil.checkFileExist(filepath)){
-            List<TopicItem> data = (List<TopicItem>) FileUtil.readObject(mContext, Constants.FILE_HOT_TOPICS_LIST);
-            mAdapter.update(data, false);
+            mTopics = (List<TopicItem>) FileUtil.readObject(mContext, Constants.FILE_HOT_TOPICS_LIST);
+            mAdapter.update(mTopics, false);
             return;
         }
 
@@ -100,7 +100,7 @@ public class HotTopicFragment extends BaseFragment {
             List<TopicItem> data = gson.fromJson(result, new TypeToken<List<TopicItem>>(){}.getType());
             int count = updateList(data);
             FileUtil.write(mContext, Constants.FILE_HOT_TOPICS_LIST,  data);
-            return mTopics;
+            return data;
         }
 
         @Override
