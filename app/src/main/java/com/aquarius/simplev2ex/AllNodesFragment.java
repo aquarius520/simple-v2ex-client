@@ -1,6 +1,5 @@
 package com.aquarius.simplev2ex;
 
-import android.database.Cursor;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import com.aquarius.simplev2ex.adapter.NodeNavigatorAdapter;
 import com.aquarius.simplev2ex.adapter.SearchNodeAdapter;
@@ -60,7 +58,7 @@ public class AllNodesFragment extends BaseFragment {
         nodeListView.setEmptyView(emptyView);
         nodeListView.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);
-        initDefaultRecyclerViewConfig(recyclerView);
+        initRecyclerViewConfig(recyclerView);
 
         searchNode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +136,4 @@ public class AllNodesFragment extends BaseFragment {
             navigatorAdapter.update(data);
         }
     }
-
-
 }

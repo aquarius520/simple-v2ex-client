@@ -30,7 +30,6 @@ public class Constants {
 
     public static final String ACTION_INSERT = "insert";
     public static final String ACTION_QUERY = "query";
-    public static final String ACTION_SELECT = "select";
     public static final String ACTION_DELETE = "delete";
     public static final String ACTION_UPDATE = "update";
 

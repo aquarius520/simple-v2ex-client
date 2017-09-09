@@ -48,7 +48,7 @@ import java.util.List;
  * Created by aquarius on 2017/8/15.
  * 话题页
  */
-public class TopicDetailActivity extends Activity {
+public class TopicDetailActivity extends BaseActivity {
 
     private static final String TAG = "TopicDetailActivity";
 
@@ -78,16 +78,9 @@ public class TopicDetailActivity extends Activity {
     private List<Reply> mReplies;
     private int mReplyCount;
 
-    private Handler mHandler = new Handler();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-        Intent intent = getIntent();
+    protected void handleIntent(Intent intent) {
         if (intent != null) {
             TopicItem item = intent.getExtras().getParcelable("topic_model");
             if (item != null) {
@@ -103,19 +96,19 @@ public class TopicDetailActivity extends Activity {
                 node = item.getNode();
             }
         }
-        setContentView(R.layout.activity_topic_detail);
-        initViews();
-        setHeaderView();
-        bindDataAndSetListener();
-        initList();
-        requestData();
     }
 
-    private void initViews() {
+    @Override
+    protected void inflateContentView() {
+        setContentView(R.layout.activity_topic_detail);
+    }
+
+    @Override
+    protected void initViews() {
         titleTopBar = (TitleTopBar) findViewById(R.id.topBarTitle);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.topic_detail_srl);
         mRecyclerView = (RecyclerView) findViewById(R.id.topic_detail_view);
-        initDefaultRecyclerViewConfig(this, mRecyclerView);
+        initRecyclerViewConfig(this, mRecyclerView);
 
         mHeader = View.inflate(this, R.layout.topic_detail_title_more, null);
         topicTitleTv = (TextView) mHeader.findViewById(R.id.topic_title);
@@ -127,9 +120,12 @@ public class TopicDetailActivity extends Activity {
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mHeader.setLayoutParams(lp);
+
+        mReplies = new ArrayList<>();
     }
 
-    private void setHeaderView() {
+    @Override
+    protected void setHeaderView() {
         topicTitleTv.setText(topicTitle);
         nodeTitleTv.setText(nodeTitle);
         contentTv.setRichText(topicContent);
@@ -138,22 +134,9 @@ public class TopicDetailActivity extends Activity {
         createdTv.setText(TimeUtil.topicCreatedTime(this, created));
     }
 
-    protected void initDefaultRecyclerViewConfig(Context context, RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setLayoutAnimation(ItemAnimationUtil.getLac(context,R.anim.alpha, 0f));
-        // recyclerView.setScrollingTouchSlop(ViewConfiguration.get(context).getScaledTouchSlop());
-    }
-
-    private void bindDataAndSetListener() {
-        titleTopBar.setTitleText(getResources().getString(R.string.topic_detail_text));
-        titleTopBar.setBackVisibility(true);
-        titleTopBar.setBackButtonOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+    @Override
+    protected void bindDataAndSetListeners() {
+        super.displayTitleTopbar(titleTopBar, getResources().getString(R.string.topic_detail_text));
 
         avatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,11 +188,8 @@ public class TopicDetailActivity extends Activity {
         startActivity(intent);
     }
 
-    private void initList() {
-        mReplies = new ArrayList<>();
-    }
-
-    private void requestData() {
+    @Override
+    protected void requestData() {
         refreshLayout.setRefreshing(true);
         requestRepliesInfo(false);
     }
@@ -273,14 +253,7 @@ public class TopicDetailActivity extends Activity {
                 contentTv.setRichText(topicContent);
                 // 更新topic内容
                 // 更新member id/avatar...等
-                Intent intent = new Intent(TopicDetailActivity.this, DataService.class);
-                Bundle bundle = new Bundle();
-                intent.putExtra(Constants.DATA_SOURCE, "topic");
-                intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_UPDATE);
-                intent.putExtra(Constants.TOPIC_ID, topicId);
-                bundle.putParcelable("topic", item);
-                intent.putExtras(bundle);
-                TopicDetailActivity.this.startService(intent);
+                startServiceUpdateTopic(mContext, item, topicId);
             }
         }
     }
@@ -307,25 +280,9 @@ public class TopicDetailActivity extends Activity {
             mRepliesAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
 
-//            int newCount = 0;
-//            ArrayList<Reply> newUpdateList = new ArrayList<>();
-//            if(data != null && data.size() > 0) {
-//                mReplies = data;
-//                newCount = updateCount(data);
-//                if (newCount > 0) {
-//                    newUpdateList.addAll(mReplies.subList(data.size() - newCount, data.size()));
-//                }
-//            }
             if (data != null && mReplyCount < data.size()) {
                 mReplyCount = data.size();
-                Intent intent = new Intent(TopicDetailActivity.this, DataService.class);
-                Bundle bundle = new Bundle();
-                intent.putExtra(Constants.DATA_SOURCE, "replies");
-                intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
-                intent.putExtra(Constants.TOPIC_ID, topicId);
-                bundle.putParcelableArrayList("replies", /*newUpdateList.size() > 0 ? newUpdateList :*/ (ArrayList) data);
-                intent.putExtras(bundle);
-                TopicDetailActivity.this.startService(intent);
+                startServiceInsertReplies(mContext, data, topicId);
             }
             else {
                 MessageUtil.showMessageBar(TopicDetailActivity.this, "没有新的回复.", "");
@@ -333,26 +290,4 @@ public class TopicDetailActivity extends Activity {
         }
     }
 
-    private int updateCount(List<Reply> data) {
-        int count = 0;
-        if (mReplies.size() > 0) {
-            count = data.size() - mReplies.size();
-        }
-        return count;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }

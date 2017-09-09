@@ -65,7 +65,7 @@ public abstract class BaseFragment extends Fragment {
         super.onDetach();
     }
 
-    protected void initDefaultRecyclerViewConfig(RecyclerView recyclerView) {
+    protected void initRecyclerViewConfig(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerView.setLayoutAnimation(ItemAnimationUtil.getLac(getActivity(),R.anim.alpha, 0f));
         recyclerView.setItemAnimator(new DefaultItemAnimator());

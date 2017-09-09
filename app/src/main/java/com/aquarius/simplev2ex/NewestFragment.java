@@ -46,7 +46,7 @@ public class NewestFragment extends BaseFragment {
         mRecyclerView = (RecyclerView) container.findViewById(R.id.newest_topic_recycler);
         mAdapter = new TopicListAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
-        initDefaultRecyclerViewConfig(mRecyclerView);
+        initRecyclerViewConfig(mRecyclerView);
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

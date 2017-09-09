@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * Created by aquarius on 2017/9/4.
  */
-public class UserHomepageActivity extends Activity {
+public class UserHomepageActivity extends BaseActivity {
 
     private static final String TAG = "UserHomepageActivity";
 
@@ -64,20 +64,10 @@ public class UserHomepageActivity extends Activity {
     private String userBio;
     private long created;
 
-    private boolean isMemberTopicExist;
-
     private List<TopicItem> mTopics;
 
-    private Handler handler = new Handler();
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-        Intent intent = getIntent();
+    protected void handleIntent(Intent intent) {
         if (intent != null) {
             Member member = intent.getExtras().getParcelable("member");
             username = member.getUsername();
@@ -90,11 +80,6 @@ public class UserHomepageActivity extends Activity {
                 avatarUrl = "http:" + avatarUrl;
             }
         }
-        setContentView(R.layout.activity_user_homepage);
-        initViews();
-        setHeaderView();
-        bindDataAndSetListeners();
-        requestData();
     }
 
     @Override
@@ -102,11 +87,17 @@ public class UserHomepageActivity extends Activity {
         MessageUtil.showMessageBar(this, "当前界面就是" + "["+ username + "]" + "的主页, 无需跳转", "知道了");
     }
 
-    private void initViews() {
+    @Override
+    protected void inflateContentView() {
+        setContentView(R.layout.activity_user_homepage);
+    }
+
+    @Override
+    protected void initViews() {
         titleTopBar = (TitleTopBar) findViewById(R.id.topBarTitle);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.user_homepage_srl);
         recyclerView = (RecyclerView) findViewById(R.id.user_homepage_view);
-        initDefaultRecyclerViewConfig(this, recyclerView);
+        initRecyclerViewConfig(this, recyclerView);
 
         headerView = View.inflate(this, R.layout.user_header_info, null);
         avatarIv = (ImageView) headerView.findViewById(R.id.avatar);
@@ -118,22 +109,17 @@ public class UserHomepageActivity extends Activity {
         headerView.setLayoutParams(lp);
     }
 
-    private void setHeaderView() {
+    @Override
+    protected void setHeaderView() {
         if (userId != 0) {
             userIdTv.setText(getResources().getString(R.string.user_id_format, userId));
         }
         GlideUtil.showNetworkImage(this, avatarUrl, avatarIv);
     }
 
-    private void bindDataAndSetListeners() {
-        titleTopBar.setTitleText(username);
-        titleTopBar.setBackVisibility(true);
-        titleTopBar.setBackButtonOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+    @Override
+    protected void bindDataAndSetListeners() {
+        super.displayTitleTopbar(titleTopBar, username);
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -149,7 +135,8 @@ public class UserHomepageActivity extends Activity {
     }
 
 
-    private void requestData() {
+    @Override
+    protected void requestData() {
         requestUserInfo(false);
     }
 
@@ -165,16 +152,15 @@ public class UserHomepageActivity extends Activity {
             updateUserPanelInfo(id, bio, created);
         }else{
             if (NetWorkUtil.isConnected())
-                OkHttpHelper.get(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(handler));
+                OkHttpHelper.get(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(mHandler));
         }
 
         mTopics = DataBaseManager.init().queryTopicByMember(username);
         if (!force && mTopics != null && mTopics.size() > 0) {
             topicListAdapter.update(mTopics, false);
             refreshLayout.setRefreshing(false);
-            isMemberTopicExist = true;
         } else if (NetWorkUtil.isConnected()) {
-            OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(handler));
+            OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(mHandler));
         } else {
             refreshLayout.setRefreshing(false);
             MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),
@@ -182,29 +168,11 @@ public class UserHomepageActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-
     class UserHeadInfoRequest extends HttpRequestCallback<V2exUser> {
 
         public UserHeadInfoRequest(Handler handler) {
             super(handler);
         }
-
         @Override
         public List<V2exUser> parseResultToList(String result) {
             Gson gson = new Gson();
@@ -233,13 +201,7 @@ public class UserHomepageActivity extends Activity {
                         .setAvatarLarge(user.getAvatar_large()).build();
 
                 // 更新member信息
-                Intent intent = new Intent(UserHomepageActivity.this, DataService.class);
-                Bundle bundle = new Bundle();
-                intent.putExtra(Constants.DATA_SOURCE, "member");
-                intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_UPDATE);
-                bundle.putParcelable("member", member);
-                intent.putExtras(bundle);
-                UserHomepageActivity.this.startService(intent);
+                startServiceUpdateMember(mContext, member);
             }
         }
     }
@@ -280,14 +242,7 @@ public class UserHomepageActivity extends Activity {
             data.remove(headerItem);
 
             if(data.size() == 0) return;
-
-            Intent intent = new Intent(UserHomepageActivity.this, DataService.class);
-            Bundle bundle = new Bundle();
-            intent.putExtra(Constants.DATA_SOURCE, "topics");
-            intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
-            bundle.putParcelableArrayList("topics", (ArrayList) data);
-            intent.putExtras(bundle);
-            UserHomepageActivity.this.startService(intent);
+            startServiceInsertTopics(mContext, data);
         }
     }
 
@@ -303,9 +258,4 @@ public class UserHomepageActivity extends Activity {
         );
     }
 
-    protected void initDefaultRecyclerViewConfig(Context context, RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setLayoutAnimation(ItemAnimationUtil.getLac(context, R.anim.alpha, 0f));
-    }
 }

@@ -33,15 +33,7 @@ import java.util.List;
  */
 public class TopicListPagerAdapter extends PagerAdapter {
 
-//    private LinkedHashMap<Integer, List<TopicItem>> mTopicCache;
-//    private LinkedHashMap<Integer, Boolean> mAddedMap;
-
     public TopicListPagerAdapter() {
-//        mTopicCache = new LinkedHashMap<>();
-//        mAddedMap = new LinkedHashMap<>();
-//        for(int i = 0 ; i < Constants.DISCOVER_CATEGORIES.length; i++) {
-//            mAddedMap.put(i, false);
-//        }
     }
 
     @Override
@@ -66,8 +58,6 @@ public class TopicListPagerAdapter extends PagerAdapter {
         List<TopicItem> topics = DataBaseManager.init().queryTopicByCategory(Constants.CATEGORY_TYPES[position]);
         if (topics != null && topics.size() > 0) {
             adapter.update(topics, true);
-//            mTopicCache.put(position, topics);
-//            mAddedMap.put(position, false);
         }else {
             if (NetWorkUtil.isConnected()) {
                 refreshLayout.setRefreshing(true);
@@ -133,12 +123,6 @@ public class TopicListPagerAdapter extends PagerAdapter {
 
         @Override
         public void onResponseSuccess(List<TopicItem> data) {
-//            List<TopicItem> cache = mTopicCache.get(position);
-//            boolean added = mAddedMap.get(position);
-//            if (!added && cache != null && cache.size() > 0) {
-//                adapter.initTopics(cache);
-//                mAddedMap.put(position, true);
-//            }
             adapter.update(data, true);
             refreshLayout.setRefreshing(false);
 

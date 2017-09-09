@@ -36,8 +36,6 @@ public class MainActivity extends Activity {
         }
         setContentView(R.layout.activity_main);
         initView();
-
-        // DataBaseManager.init().insertNode(null);
     }
 
     private void initView() {
@@ -48,37 +46,32 @@ public class MainActivity extends Activity {
     }
 
     private void initBottomTab() {
-        //set button text style
         bottomTabLayout.setButtonTextStyle(R.style.TextGray12);
         // set buttons from menu resource
         bottomTabLayout.setItems(R.menu.menu_bottom_layout);
-        //set on selected tab listener.
+        // set on selected tab listener.
         bottomTabLayout.setListener(new BottomTabLayout.OnItemSelectedListener() {
             @Override
             public void onItemSelected(int id) {
                 switchFragment(id);
             }
         });
-        //set button that will be select on start activity
+        // set button that will be select on start activity
         bottomTabLayout.setSelectedTab(R.id.hot_menu_button);
-        //switchFragment(R.id.hot_menu_button);
-        //enable indicator
+        // switchFragment(R.id.hot_menu_button);
+        // enable indicator
         bottomTabLayout.setIndicatorVisible(true);
-        //indicator height
         bottomTabLayout.setIndicatorHeight(getResources().getDimension(R.dimen.indicator_height));
-        //indicator color
         bottomTabLayout.setIndicatorColor(R.color.colorIndicatorDark);
-        //indicator line color
-        //bottomTabLayout.setIndicatorLineColor(R.color.dark);
-        //bottomTabLayout.setSelectedTab(R.id.menu_button5);
+        // bottomTabLayout.setIndicatorLineColor(R.color.dark);
+        // bottomTabLayout.setSelectedTab(R.id.menu_button5);
 
-        //setup bubble style
-        //bottomTabLayout.setTabBubbleColor(ContextCompat.getColor(this, R.color.blue));
-        //bottomTabLayout.setTabBubblePadding(0, 0, 0, 0);
-        //bottomTabLayout.setTabBubbleTextStyle(R.style.TextWhite12);
+        // bottomTabLayout.setTabBubbleColor(ContextCompat.getColor(this, R.color.blue));
+        // bottomTabLayout.setTabBubblePadding(0, 0, 0, 0);
+        // bottomTabLayout.setTabBubbleTextStyle(R.style.TextWhite12);
 
-        //show bubble
-        //bottomTabLayout.showTabBubbleCount(R.id.menu_button1, 3);
+        // show bubble
+        // bottomTabLayout.showTabBubbleCount(R.id.menu_button1, 3);
     }
 
     private void switchFragment(int id) {
@@ -87,9 +80,6 @@ public class MainActivity extends Activity {
             case R.id.newest_menu_button:
                 if (newestFragment == null) {
                     newestFragment = new NewestFragment();
-//                    Bundle data = new Bundle();
-//                    data.putString("title", getString(R.string.newest));
-//                    newestFragment.setArguments(data);
                 }
                 titleTopBar.setTitleText(getString(R.string.newest_post));
                 fragment = newestFragment;
@@ -127,7 +117,6 @@ public class MainActivity extends Activity {
         }
 
         if (fragment != null) {
-
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 
