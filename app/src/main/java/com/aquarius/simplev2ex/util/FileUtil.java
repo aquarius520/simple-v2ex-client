@@ -146,4 +146,29 @@ public class FileUtil {
         fileSize += getFileSizeOfDir(filesDir);
         return fileSize;
     }
+
+    public static void clearFileCache(Context context) {
+        clearCacheFolder(context.getFilesDir(),System.currentTimeMillis());
+    }
+
+    public static int clearCacheFolder(File dir, long curTime) {
+        int deletedFiles = 0;
+        if (dir!= null && dir.isDirectory()) {
+            try {
+                for (File child:dir.listFiles()) {
+                    if (child.isDirectory()) {
+                        deletedFiles += clearCacheFolder(child, curTime);
+                    }
+                    if (child.lastModified() < curTime) {
+                        if (child.delete()) {
+                            deletedFiles++;
+                        }
+                    }
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return deletedFiles;
+    }
 }

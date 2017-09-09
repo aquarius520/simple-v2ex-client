@@ -13,6 +13,8 @@ import android.text.Html;
 import android.widget.TextView;
 
 import com.aquarius.simplev2ex.R;
+import com.aquarius.simplev2ex.config.AppConfig;
+import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.aquarius.simplev2ex.util.ScreenUtil;
 import com.bumptech.glide.GenericRequestBuilder;
 import com.bumptech.glide.Glide;
@@ -66,6 +68,10 @@ public class URLImageGetter implements Html.ImageGetter {
 //        ImageGetterAsyncTask asyncTask = new ImageGetterAsyncTask(urlDrawable);
 //        asyncTask.execute(source);
         final URLDrawable urlDrawable = new URLDrawable();
+        if (NetWorkUtil.isFastMobileNetwork(mContext) && !AppConfig.isDownloadImageInMobileNetwork()){
+            return urlDrawable;
+        }
+
         final GenericRequestBuilder load;
         final Target target;
 //        if(isGif(url)){

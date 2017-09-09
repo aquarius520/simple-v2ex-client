@@ -21,17 +21,17 @@
             android:title="@string/settings_clear_img_cache"
             android:summary="0KB"/>
 
-        <Preference
-            android:key="pref_clear_file_cache"
-            android:title="@string/settings_clear_file_cache"
-            android:summary="0KB"/>
+        <!--<Preference-->
+            <!--android:key="pref_clear_file_cache"-->
+            <!--android:title="@string/settings_clear_file_cache"-->
+            <!--android:summary="0KB" />-->
 
     </PreferenceCategory>
 
    <PreferenceCategory
         android:title="@string/settings_more">
         <Preference
-            android:key="pref_about"
+            android:key="about_pref"
             android:title="@string/settings_about"
             android:summary="@string/settings_about_summary"/>
 

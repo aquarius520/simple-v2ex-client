@@ -37,5 +37,6 @@ public class Constants {
     // preference 配置
     public static final String KEY_LAST_REFRESH_NODES_TIME = "last_refresh_nodes_time";
     public static final String KEY_USE_HTTPS = "use_https";
+    public static final String KEY_NOT_LOAD_IMG_MOBILE_NETWORK = "not_load_image_mobile_network";
 
 }

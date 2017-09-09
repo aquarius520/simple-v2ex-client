@@ -1,25 +1,17 @@
 package com.aquarius.simplev2ex;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aquarius.simplev2ex.adapter.TopicRepliesAdapter;
-import com.aquarius.simplev2ex.core.DataService;
 import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.database.DataBaseManager;
@@ -29,8 +21,6 @@ import com.aquarius.simplev2ex.entity.Reply;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.support.HeaderViewRecyclerAdapter;
-import com.aquarius.simplev2ex.support.ItemAnimationUtil;
-import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.GlideUtil;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;

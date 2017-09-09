@@ -8,6 +8,10 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.view.View;
+import android.widget.TextView;
 
 import com.aquarius.simplev2ex.config.AppConfig;
 import com.aquarius.simplev2ex.util.Constants;
@@ -22,7 +26,9 @@ public class SettingFragment extends PreferenceFragment {
     SharedPreferences mPreferences;
     CheckBoxPreference mHttpsPref;
     Preference mImageCachePref;
-    Preference mFileCachePref;
+    CheckBoxPreference mNoImagePref;
+//    Preference mFileCachePref;
+    Preference mAboutPref;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +43,17 @@ public class SettingFragment extends PreferenceFragment {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 AppConfig.writeToPreference(getActivity(), Constants.KEY_USE_HTTPS, mHttpsPref.isChecked());
+                return true;
+            }
+        });
+
+        mNoImagePref = (CheckBoxPreference) findPreference("pref_show_img_only_wifi");
+        mNoImagePref.setChecked(!AppConfig.isDownloadImageInMobileNetwork());
+        mNoImagePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                AppConfig.writeToPreference(getActivity(), Constants.KEY_NOT_LOAD_IMG_MOBILE_NETWORK,
+                        mNoImagePref.isChecked());
                 return true;
             }
         });
@@ -71,6 +88,7 @@ public class SettingFragment extends PreferenceFragment {
                                 }.execute();
                                 }
                             })
+                        .setCancelable(true)
                         .create();
                 dialog.show();
                 return true;
@@ -78,6 +96,54 @@ public class SettingFragment extends PreferenceFragment {
         });
 
 
+//        mFileCachePref = findPreference("pref_clear_file_cache");
+//        mFileCachePref.setSummary(FileUtil.getFileSize(FileUtil.getFileCache(getActivity())));
+//        mFileCachePref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//                return true;
+//            }
+//        });
+
+        mAboutPref = findPreference("about_pref");
+        mAboutPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                showAbout();
+                return true;
+            }
+        });
+    }
+
+    private void showAbout() {
+        View contentView = View.inflate(getActivity(), R.layout.setting_about, null);
+        TextView about = (TextView) contentView.findViewById(R.id.about_text);
+        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setView(contentView)
+//                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                })
+                .setCancelable(true)
+                .create();
+
+        StringBuilder sb = new StringBuilder();
+        String author = "aquarius";
+        String authorUrl = sb.append("<a href='")
+                            .append("https://github.com/aquarius520")
+                            .append("'>")
+                            .append("https://github.com/aquarius520")
+                            .append("</a>")
+                            .append("<br/>").toString();
+        String message = getActivity().getString(R.string.app_name) + "<br/>"  + authorUrl +
+                "<br/>" + "by@" + author;
+        CharSequence charSequence = Html.fromHtml(message);
+        about.setText(charSequence);
+        about.setMovementMethod(LinkMovementMethod.getInstance());
+
+        dialog.show();
     }
 
 }

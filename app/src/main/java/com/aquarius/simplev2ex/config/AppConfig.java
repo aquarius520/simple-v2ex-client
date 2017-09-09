@@ -18,7 +18,7 @@ public class AppConfig {
 
     // 移动网络下是否加载图片
     public static boolean isDownloadImageInMobileNetwork() {
-        return true;
+        return !readPreference(V2exApplication.getInstance(), Constants.KEY_NOT_LOAD_IMG_MOBILE_NETWORK, false);
     }
 
     public static SharedPreferences getSharedPreference(Context context) {

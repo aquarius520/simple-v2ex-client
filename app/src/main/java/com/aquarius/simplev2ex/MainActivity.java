@@ -9,7 +9,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.aquarius.simplev2ex.database.DataBaseManager;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 import com.aquarius.simplev2ex.views.thirdparty.BottomTabLayout;
 

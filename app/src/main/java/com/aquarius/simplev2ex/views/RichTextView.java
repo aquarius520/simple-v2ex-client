@@ -61,9 +61,9 @@ public class RichTextView extends TextView implements View.OnAttachStateChangeLi
         }
 
         // 如果是移动网络 且打开了移动网络下不加载图片的开关
-        if (NetWorkUtil.isFastMobileNetwork(getContext()) && AppConfig.isDownloadImageInMobileNetwork())  {
-
-        } else {
+//        if (NetWorkUtil.isFastMobileNetwork(getContext()) && AppConfig.isDownloadImageInMobileNetwork())  {
+//
+//        } else {
             // 否则显示图片 并处理图片点击事件
 //            ImageSpan[] imageSpans = htmlSsb.getSpans(0, htmlSsb.length(), ImageSpan.class);
 //            final ArrayList<String> imgUrls = new ArrayList<>();
@@ -91,7 +91,7 @@ public class RichTextView extends TextView implements View.OnAttachStateChangeLi
 //                }
 //                htmlSsb.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 //            }
-        }
+//        }
 
         // TODO: 处理文字中的链接点击事件
         URLSpan[] urlSpans = htmlSsb.getSpans(0, htmlSsb.length(), URLSpan.class);
