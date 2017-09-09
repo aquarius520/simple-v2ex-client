@@ -42,5 +42,8 @@
     <string name="setting_use_https_summary">安全的请求连接，较HTTP响应速度稍慢</string>
     <string name="settings_clear_img_cache">清除图片缓存</string>
     <string name="settings_clear_file_cache">清除文件缓存</string>
+    <string name="settings_more">其他</string>
+    <string name="settings_about">关于应用</string>
+    <string name="settings_about_summary">关于应用、作者信息</string>
 
 </resources>

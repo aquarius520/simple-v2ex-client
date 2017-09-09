@@ -97,9 +97,53 @@ public class FileUtil {
     /**
      * 检查文件是否存在
      */
-
     public static boolean checkFileExist(String path) {
         return new File(path).exists();
     }
 
+    // 获得某个目录下文件的大小
+    public static long getFileSizeOfDir(File dir) {
+        if (dir == null) {
+            return 0;
+        }
+        if (!dir.isDirectory()) {
+            return 0;
+        }
+
+        long dirSize = 0;
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            if (file.isFile()) {
+                dirSize += file.length();
+            }else if (file.isDirectory()){
+                dirSize += getFileSizeOfDir(file);
+            }
+        }
+        return dirSize;
+    }
+
+    public static String getFileSize(long size) {
+        if(size < 0) return "0K";
+        java.text.DecimalFormat df = new java.text.DecimalFormat("##.##");
+        float count = (float) size / 1024;
+        if (count >= 1024) {
+            return df.format(count / 1024) + "M";
+        } else {
+            return df.format(count) + "K";
+        }
+    }
+
+    public static long getCacheSize(Context context){
+        long fileSize = 0;
+        File cacheDir = context.getCacheDir();
+        fileSize += getFileSizeOfDir(cacheDir);
+        return fileSize;
+    }
+
+    public static long getFileCache(Context context) {
+        long fileSize = 0;
+        File filesDir = context.getFilesDir();
+        fileSize += getFileSizeOfDir(filesDir);
+        return fileSize;
+    }
 }

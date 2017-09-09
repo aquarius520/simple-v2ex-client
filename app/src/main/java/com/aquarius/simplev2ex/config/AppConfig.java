@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.aquarius.simplev2ex.V2exApplication;
+import com.aquarius.simplev2ex.util.Constants;
+
 /**
  * Created by aquarius on 2017/8/7.
  */
 public class AppConfig {
 
-    public static boolean connectViaHttps() {
-        return true;
+    public static boolean isHttps() {
+        return readPreference(V2exApplication.getInstance(), Constants.KEY_USE_HTTPS, false);
     }
 
     // 移动网络下是否加载图片

@@ -48,7 +48,7 @@ public class V2exManager {
     private static final String API_TOPIC_PATH = "/api/topics/show.json";
 
     public static String getBaseUrl() {
-        return AppConfig.connectViaHttps() ?  BASE_HTTPS_URL : BASE_HTTP_URL;
+        return AppConfig.isHttps() ?  BASE_HTTPS_URL : BASE_HTTP_URL;
     }
 
     /**

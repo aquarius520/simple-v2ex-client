@@ -5,7 +5,6 @@
         android:title="@string/setting_main">
 
         <CheckBoxPreference
-            android:defaultValue="true"
             android:key="pref_use_https"
             android:title="@string/setting_use_https"
             android:summary="@string/setting_use_https_summary"/>
@@ -29,19 +28,8 @@
 
     </PreferenceCategory>
 
-   <!-- <PreferenceCategory
+   <PreferenceCategory
         android:title="@string/settings_more">
-
-        <Preference
-            android:key="pref_check_update"
-            android:title="@string/settings_check_update"
-            android:summary="@string/settings_check_update_summary"/>
-
-        <Preference
-            android:key="pref_feedback"
-            android:title="@string/settings_feedback"
-            android:summary="@string/settings_feedback_summary"/>
-
         <Preference
             android:key="pref_about"
             android:title="@string/settings_about"
