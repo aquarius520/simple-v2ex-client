@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="settings_settings"
+        android:title="@string/setting_main">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_use_https"
+            android:title="@string/setting_use_https"
+            android:summary="@string/setting_use_https_summary"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_show_img_only_wifi"
+            android:title="@string/setting_show_img_only_wifi"
+            android:summary="@string/setting_show_img_only_wifi_summary"
+            />
+
+        <Preference
+            android:key="pref_clear_img_cache"
+            android:title="@string/settings_clear_img_cache"
+            android:summary="0KB"/>
+
+        <Preference
+            android:key="pref_clear_file_cache"
+            android:title="@string/settings_clear_file_cache"
+            android:summary="0KB"/>
+
+    </PreferenceCategory>
+
+   <!-- <PreferenceCategory
+        android:title="@string/settings_more">
+
+        <Preference
+            android:key="pref_check_update"
+            android:title="@string/settings_check_update"
+            android:summary="@string/settings_check_update_summary"/>
+
+        <Preference
+            android:key="pref_feedback"
+            android:title="@string/settings_feedback"
+            android:summary="@string/settings_feedback_summary"/>
+
+        <Preference
+            android:key="pref_about"
+            android:title="@string/settings_about"
+            android:summary="@string/settings_about_summary"/>
+
+    </PreferenceCategory>-->
+</PreferenceScreen>

@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
     private HotTopicFragment hotTopicFragment;
     private DiscoverFragment discoverFragment;
     private AllNodesFragment allNodesFragment;
-    private SettingFragment settingFragment;
+    private OwnerFragment ownerFragment;
 
     private Fragment previousFragment;
 
@@ -106,11 +106,11 @@ public class MainActivity extends Activity {
                 fragment = allNodesFragment;
                 break;
             case R.id.setting_menu_button:
-                if (settingFragment == null) {
-                    settingFragment = new SettingFragment();
+                if (ownerFragment == null) {
+                    ownerFragment = new OwnerFragment();
                 }
                 titleTopBar.setTitleText(getString(R.string.my));
-                fragment = settingFragment;
+                fragment = ownerFragment;
                 break;
             default:
                 break;

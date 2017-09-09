@@ -38,6 +38,8 @@
             >
         </activity>
 
+        <activity android:name=".SettingActivity" android:screenOrientation="portrait"/>
+
         <service android:name=".core.DataService"/>
 
         <activity android:name=".testlibs.TestActivity" android:screenOrientation="portrait">
