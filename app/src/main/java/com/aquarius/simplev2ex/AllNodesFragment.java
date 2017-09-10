@@ -108,7 +108,7 @@ public class AllNodesFragment extends BaseFragment {
         }
 
         if (NetWorkUtil.isConnected()) {
-            OkHttpHelper.get("http://www.v2ex.com/?tab=nodes", new NodeNavigatorRequest(mHandler));
+            OkHttpHelper.getAsync("http://www.v2ex.com/?tab=nodes", new NodeNavigatorRequest(mHandler));
         }
     }
 

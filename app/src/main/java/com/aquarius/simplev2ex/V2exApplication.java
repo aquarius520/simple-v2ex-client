@@ -48,7 +48,7 @@ public class V2exApplication extends Application {
 
     private void requestNodesAndSaveInTable() {
         if (NetWorkUtil.isConnected()) {
-            OkHttpHelper.get(V2exManager.getAllNodeInfoUrl(), new Callback() {
+            OkHttpHelper.getAsync(V2exManager.getAllNodeInfoUrl(), new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     Log.e(TAG, "acquire nodes error. err = " + e.getMessage());

@@ -79,7 +79,7 @@ public class HotTopicFragment extends BaseFragment {
 
         // 2. 如果本地没有数据,则主动请求一次
        if (NetWorkUtil.isConnected()) {
-            OkHttpHelper.get(V2exManager.getHotTopicUrl(), new HotTopicRequestCallBack(mHandler));
+            OkHttpHelper.getAsync(V2exManager.getHotTopicUrl(), new HotTopicRequestCallBack(mHandler));
         }else {
             mRefreshLayout.setRefreshing(false);
             MessageUtil.showNetworkErrorMsg(mContext, mContext.getResources().getString(R.string.network_error),

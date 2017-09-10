@@ -50,7 +50,7 @@ public class TopicListPagerAdapter extends PagerAdapter {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                OkHttpHelper.get(V2exManager.getTopicCategoryUrl(Constants.CATEGORY_TYPES[position]),
+                OkHttpHelper.getAsync(V2exManager.getTopicCategoryUrl(Constants.CATEGORY_TYPES[position]),
                         new CategoryTypeRequest(new Handler(context.getMainLooper()), adapter, refreshLayout, position));
             }
         });
@@ -61,7 +61,7 @@ public class TopicListPagerAdapter extends PagerAdapter {
         }else {
             if (NetWorkUtil.isConnected()) {
                 refreshLayout.setRefreshing(true);
-                OkHttpHelper.get(V2exManager.getTopicCategoryUrl(Constants.CATEGORY_TYPES[position]),
+                OkHttpHelper.getAsync(V2exManager.getTopicCategoryUrl(Constants.CATEGORY_TYPES[position]),
                         new CategoryTypeRequest(new Handler(context.getMainLooper()), adapter, refreshLayout, position));
             }else {
                 MessageUtil.showNetworkErrorMsg(context, context.getResources().getString(R.string.network_error),

@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F2F2F2">
+    android:layout_height="match_parent">
 
     <include android:id="@+id/topBarTitle" layout="@layout/common_top_bar_title"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#f2f2f2">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -74,7 +79,7 @@
         android:text="@string/sign_in_title"
         android:textColor="#fff"
         android:textSize="18sp" />
-
+    </LinearLayout>
 
 
 </LinearLayout>

@@ -195,9 +195,9 @@ public class TopicDetailActivity extends BaseActivity {
         // 2.请求网络，获取最新的回复列表
         else if (NetWorkUtil.isConnected()) {
             if (TextUtils.isEmpty(topicContent)) {
-                 OkHttpHelper.get(V2exManager.getTopicByTopicIdUrl(topicId), new TopicContentRequest(mHandler));
+                 OkHttpHelper.getAsync(V2exManager.getTopicByTopicIdUrl(topicId), new TopicContentRequest(mHandler));
             }
-            OkHttpHelper.get(V2exManager.getTopicRepliesUrl(topicId), new TopicReplyRequest(mHandler));
+            OkHttpHelper.getAsync(V2exManager.getTopicRepliesUrl(topicId), new TopicReplyRequest(mHandler));
         } else {
             refreshLayout.setRefreshing(false);
             MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),

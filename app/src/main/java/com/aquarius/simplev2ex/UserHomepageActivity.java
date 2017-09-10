@@ -143,7 +143,7 @@ public class UserHomepageActivity extends BaseActivity {
             updateUserPanelInfo(id, bio, created);
         }else{
             if (NetWorkUtil.isConnected())
-                OkHttpHelper.get(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(mHandler));
+                OkHttpHelper.getAsync(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(mHandler));
         }
 
         mTopics = DataBaseManager.init().queryTopicByMember(username);
@@ -151,7 +151,7 @@ public class UserHomepageActivity extends BaseActivity {
             topicListAdapter.update(mTopics, false);
             refreshLayout.setRefreshing(false);
         } else if (NetWorkUtil.isConnected()) {
-            OkHttpHelper.get(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(mHandler));
+            OkHttpHelper.getAsync(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(mHandler));
         } else {
             refreshLayout.setRefreshing(false);
             MessageUtil.showNetworkErrorMsg(this, this.getResources().getString(R.string.network_error),

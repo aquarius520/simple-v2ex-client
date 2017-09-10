@@ -100,9 +100,9 @@ public class NodeTopicsActivity extends BaseActivity {
         // 如果没有数据，则联网查询一次
         else if (NetWorkUtil.isConnected()) {
             if (nodeId != 0) {
-                OkHttpHelper.get(V2exManager.getTopicsOfNodeUrl(nodeId), new NodeTopicsRequest(mHandler));
+                OkHttpHelper.getAsync(V2exManager.getTopicsOfNodeUrl(nodeId), new NodeTopicsRequest(mHandler));
             } else if (!TextUtils.isEmpty(nodeName)) {
-                OkHttpHelper.get(V2exManager.getTopicsOfNodeUrl(nodeName), new NodeTopicsRequest(mHandler));
+                OkHttpHelper.getAsync(V2exManager.getTopicsOfNodeUrl(nodeName), new NodeTopicsRequest(mHandler));
             }
         }else {
             refreshLayout.setRefreshing(false);

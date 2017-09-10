@@ -136,4 +136,7 @@ public class V2exManager {
         return getBaseUrl() + API_TOPIC_PATH + "?username=" + username;
     }
 
+    public static String getSignInBaseUrl() {
+        return BASE_HTTPS_URL + "/signin";
+    }
 }

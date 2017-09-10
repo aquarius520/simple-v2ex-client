@@ -14,6 +14,8 @@ import android.view.ViewGroup;
  */
 public class OwnerFragment extends Fragment {
 
+    private static final int REQUEST_CODE_SIGN_IN = 200;
+
     private Context mContext;
     private View mSettingLayout;
     private View mSignInLayout;
@@ -45,12 +47,11 @@ public class OwnerFragment extends Fragment {
         mFavoriteTopicLayout = view.findViewById(R.id.favorite_topic);
         mSignOutLayout = view.findViewById(R.id.signout);
 
-
         mSignInLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SignInActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_SIGN_IN);
             }
         });
 

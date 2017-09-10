@@ -78,7 +78,7 @@ public class NewestFragment extends BaseFragment {
         }
 
         if (NetWorkUtil.isConnected()) {
-            OkHttpHelper.get(V2exManager.getNewestTopicUrl(), new NewestRequestCallBack(mHandler));
+            OkHttpHelper.getAsync(V2exManager.getNewestTopicUrl(), new NewestRequestCallBack(mHandler));
         }else {
             mRefreshLayout.setRefreshing(false);
             MessageUtil.showNetworkErrorMsg(mContext, mContext.getResources().getString(R.string.network_error),

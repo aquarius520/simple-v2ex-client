@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -166,5 +167,40 @@ public class HtmlParser {
             return null;
         }
         return nodeList;
+    }
+
+    // 解析登录页面中需要的参数值
+    public static HashMap<String, String> getSignInParams(String htmlStr) {
+        HashMap<String, String> params = new HashMap<>(4);
+        try {
+            Document doc = Jsoup.parse(htmlStr);
+            Element body = doc.body();
+
+            Elements elements = body.getElementsByAttributeValue("action", "/signin");
+            for (Element element : elements) {
+                Elements inputs = element.getElementsByTag("input");
+                for (Element input : inputs) {
+                    if (input.attr("type").equalsIgnoreCase("text")) {
+                        params.put("username_key", input.attr("name"));
+                    }
+                    else if (input.attr("type").equalsIgnoreCase("password")) {
+                        params.put("password_key", input.attr("name"));
+
+                    }
+                    else if (input.attr("type").equalsIgnoreCase("hidden") &&
+                            input.attr("name").equalsIgnoreCase("once")) {
+                        params.put("once", input.attr("value"));
+                    }
+                    else if (input.attr("type").equalsIgnoreCase("hidden") &&
+                            input.attr("name").equalsIgnoreCase("next")) {
+                        params.put("next", input.attr("value"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return params;
+        }
+        return params;
     }
 }
