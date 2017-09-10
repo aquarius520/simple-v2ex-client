@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
+import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 
@@ -12,6 +13,10 @@ import com.aquarius.simplev2ex.views.TitleTopBar;
  * Created by aquarius on 2017/9/10.
  */
 public class TopicPostActivity extends BaseActivity {
+
+    public static final String TAG = "TopicPostActivity";
+
+    private static final int REQUEST_NODE_NAME_CODE = 100;
 
     private TitleTopBar mTitleTopBar;
     private EditText mNodeNameView;
@@ -47,14 +52,24 @@ public class TopicPostActivity extends BaseActivity {
         mNodeNameView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(TopicPostActivity.this, NodeListActivity.class);
+                startActivityForResult(intent, REQUEST_NODE_NAME_CODE);
             }
         });
     }
 
     @Override
     protected void requestData() {
+    }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Constants.RESULT_CODE_NODE) {
+            String name = data.getStringExtra("name");
+            String title = data.getStringExtra("title");
+            mNodeNameView.setText(title);
+        }
     }
 
     class ActionBtnOnclickListener implements View.OnClickListener {
@@ -74,7 +89,7 @@ public class TopicPostActivity extends BaseActivity {
                 MessageUtil.showMessageBar(TopicPostActivity.this, "标题为空，不合法", null);
                 return;
             }
-            
+
         }
     }
 }

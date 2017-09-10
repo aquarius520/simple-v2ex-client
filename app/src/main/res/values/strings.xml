@@ -30,6 +30,7 @@
     <string name="node_name">节点名</string>
     <string name="topic_title">标题</string>
     <string name="topic_content">内容</string>
+    <string name="select_node">选择节点</string>
 
     <string name="sign_desc">尚未登录,请登录</string>
     <string name="sign_in_title">登录</string>

@@ -55,8 +55,8 @@ public class TestActivity extends Activity {
 //        nodes.add(new Node.Builder("111", "").build());
 //        nodes.add(new Node.Builder("444", "").build());
 
-        SearchNodeAdapter adapter = new SearchNodeAdapter(this, nodes);
-        listview.setAdapter(adapter);
+        //SearchNodeAdapter adapter = new SearchNodeAdapter(this, nodes);
+        //listview.setAdapter(adapter);
 
         //circleImageView = (CircleImageView) findViewById(R.id.avatar);
 

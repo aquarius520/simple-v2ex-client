@@ -220,7 +220,7 @@ public class DataBaseManager {
         return null;
     }
 
-    public List<Node> queryNodes(String key) {
+    public List<Node> queryNodes(String key, boolean allMatch) {
         List<Node> nodes = new ArrayList<>();
         if(TextUtils.isEmpty(key)) {
             return nodes;
@@ -233,7 +233,11 @@ public class DataBaseManager {
                 String selection = DatabaseHelper.NODE_NAME + " LIKE ? OR " + DatabaseHelper.NODE_TITLE + " LIKE ?";
                 String[] selectionArgs = new String[]{"%"+key+"%", "%"+key+"%"};
                 String orderBy = DatabaseHelper.NODE_NAME;
-                Cursor cursor = db.query(tableName, columns, selection, selectionArgs, null, null, orderBy, null);
+                if(allMatch) {
+                    orderBy = DatabaseHelper.NODE_TOPICS + " DESC";
+                }
+                Cursor cursor = db.query(tableName, columns, allMatch ? null : selection,
+                         allMatch ? null : selectionArgs, null, null, orderBy, null);
                 while (cursor.moveToNext()) {
                     Node node = new Node.Builder(cursor.getString(0), cursor.getString(1)).build();
                     nodes.add(node);
