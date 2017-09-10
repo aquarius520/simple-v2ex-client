@@ -16,7 +16,7 @@
             android:layout_marginLeft="8dp"/>
 
         <TextView
-            android:id="@+id/sign"
+            android:id="@+id/sign_in"
             android:layout_toRightOf="@id/avatar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

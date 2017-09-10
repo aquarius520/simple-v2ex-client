@@ -16,6 +16,11 @@ public class OwnerFragment extends Fragment {
 
     private Context mContext;
     private View mSettingLayout;
+    private View mSignInLayout;
+    private View mPostTopicLayout;
+    private View mFavoriteNodeLayout;
+    private View mFavoriteTopicLayout;
+    private View mSignOutLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +37,22 @@ public class OwnerFragment extends Fragment {
     }
 
     private void initViews(View view) {
+
+        mSignInLayout = view.findViewById(R.id.sign_in);
         mSettingLayout = view.findViewById(R.id.settings);
+        mPostTopicLayout = view.findViewById(R.id.post_topic);
+        mFavoriteNodeLayout = view.findViewById(R.id.favorite_node);
+        mFavoriteTopicLayout = view.findViewById(R.id.favorite_topic);
+        mSignOutLayout = view.findViewById(R.id.signout);
+
+        mSignInLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, SignInActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         mSettingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
