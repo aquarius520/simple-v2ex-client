@@ -57,6 +57,12 @@ public abstract class BaseActivity extends Activity {
         });
     }
 
+    protected void displayActionTopbar(TitleTopBar titleTopBar, String actionText, View.OnClickListener listener) {
+        titleTopBar.setActionText(actionText);
+        titleTopBar.setActionBtnVisibility(true);
+        titleTopBar.setActionBtnOnClickListener(listener);
+    }
+
     protected void startServiceInsertTopics(Context context, List<TopicItem> data) {
         Intent intent = new Intent(context, DataService.class);
         Bundle bundle = new Bundle();

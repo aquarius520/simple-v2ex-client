@@ -42,6 +42,8 @@
 
         <activity android:name=".SignInActivity" android:screenOrientation="portrait"/>
 
+        <activity android:name=".TopicPostActivity" android:screenOrientation="portrait"/>
+
         <service android:name=".core.DataService"/>
 
         <activity android:name=".testlibs.TestActivity" android:screenOrientation="portrait">

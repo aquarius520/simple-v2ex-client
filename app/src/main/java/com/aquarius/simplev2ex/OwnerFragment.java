@@ -45,6 +45,7 @@ public class OwnerFragment extends Fragment {
         mFavoriteTopicLayout = view.findViewById(R.id.favorite_topic);
         mSignOutLayout = view.findViewById(R.id.signout);
 
+
         mSignInLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,6 +54,13 @@ public class OwnerFragment extends Fragment {
             }
         });
 
+        mPostTopicLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, TopicPostActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mSettingLayout.setOnClickListener(new View.OnClickListener() {
             @Override

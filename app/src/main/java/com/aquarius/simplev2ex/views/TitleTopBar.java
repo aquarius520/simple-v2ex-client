@@ -17,6 +17,7 @@ public class TitleTopBar extends RelativeLayout {
 
     private ImageView back;
     private TextView title;
+    private TextView action;
 
     public TitleTopBar(Context context) {
         this(context, null, 0);
@@ -36,11 +37,18 @@ public class TitleTopBar extends RelativeLayout {
         View view = inflater.inflate(R.layout.title_top_bar_layout, this, true);
         back = (ImageView) view.findViewById(R.id.back);
         title = (TextView) view.findViewById(R.id.title);
+        action = (TextView) view.findViewById(R.id.action);
     }
 
     public void setTitleText(String text) {
         if (title != null) {
             title.setText(text);
+        }
+    }
+
+    public void setActionText(String text) {
+        if (action != null) {
+            action.setText(text);
         }
     }
 
@@ -56,9 +64,21 @@ public class TitleTopBar extends RelativeLayout {
         }
     }
 
+    public void setActionBtnVisibility(boolean visible) {
+        if (action != null) {
+            action.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+
     public void setBackButtonOnClickListener(OnClickListener listener) {
         if (back != null) {
             back.setOnClickListener(listener);
+        }
+    }
+
+    public void setActionBtnOnClickListener(OnClickListener listener) {
+        if (action != null) {
+            action.setOnClickListener(listener);
         }
     }
 }

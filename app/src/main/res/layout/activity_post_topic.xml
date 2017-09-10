@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/topBarTitle"
+        layout="@layout/common_top_bar_title" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#EAEAEA">
+
+        <EditText
+            android:id="@+id/node_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/edit_text_bg_selector"
+            android:layout_marginLeft="10dp"
+            android:editable="false"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="8dp"
+            android:cursorVisible="false"
+            android:textSize="16sp"
+            android:hint="@string/node_name"/>
+
+        <EditText
+            android:id="@+id/topic_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/edit_text_bg_selector"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:hint="@string/topic_title"/>
+
+        <EditText
+            android:id="@+id/topic_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:gravity="left|top"
+            android:background="@drawable/edit_text_bg_selector"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="8dp"
+            android:inputType="textMultiLine"
+            android:lineSpacingExtra="4dp"
+            android:lines="20"
+            android:textSize="16sp"
+            android:hint="@string/topic_content"/>
+
+    </LinearLayout>
+
+</LinearLayout>

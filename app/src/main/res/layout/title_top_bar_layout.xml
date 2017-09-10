@@ -23,6 +23,18 @@
         android:text="Simple V2ex"
         android:textSize="16sp"/>
 
+    <TextView
+        android:id="@+id/action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:visibility="gone"
+        />
+
     <!-- 底部分割线 -->
     <View android:layout_width="match_parent"
         android:layout_height="1dp"
