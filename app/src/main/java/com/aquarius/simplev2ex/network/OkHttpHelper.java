@@ -1,12 +1,20 @@
 package com.aquarius.simplev2ex.network;
 
-import com.aquarius.simplev2ex.core.CookiesManager;
+import android.text.TextUtils;
+
+import com.aquarius.simplev2ex.V2exApplication;
+import com.aquarius.simplev2ex.core.V2exCookieJar;
+import com.aquarius.simplev2ex.core.V2exManager;
+import com.aquarius.simplev2ex.support.PersistentCookieStore;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-import okhttp3.CacheControl;
 import okhttp3.Callback;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -22,6 +30,8 @@ public class OkHttpHelper {
 
     private static final MediaType MEDIA_TYPE_TEXT = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 
+    private static PersistentCookieStore mPersistentCookieStore =  new PersistentCookieStore(V2exApplication.getInstance());
+
     private static OkHttpClient CLIENT;
 
 
@@ -29,12 +39,18 @@ public class OkHttpHelper {
         if (CLIENT == null) {
             synchronized (OkHttpHelper.class) {
                 if (CLIENT == null) {
-                    CLIENT =  new OkHttpClient.Builder().followSslRedirects(false)
-                            .followRedirects(false).cookieJar(new CookiesManager()).build();
+                    CLIENT =  new OkHttpClient.Builder()
+//                            .followSslRedirects(false)
+//                            .followRedirects(false)
+                            .cookieJar(new V2exCookieJar(new CookieManager(mPersistentCookieStore, CookiePolicy.ACCEPT_ALL))).build();
                 }
             }
         }
         return CLIENT;
+    }
+
+    public static boolean clearCookies() {
+        return mPersistentCookieStore.removeAll();
     }
 
     public static String get(String url) {
@@ -53,11 +69,11 @@ public class OkHttpHelper {
 
     public static void getAsync(String url, Callback callback) {
         // CacheControl cacheControl = new CacheControl.Builder().noCache().build();
-        Request request = new Request.Builder()/*.cacheControl(cacheControl)*/.url(url).build();
+        Request request = addHeaders("")/*.cacheControl(cacheControl)*/.url(url).build();
         getOKHttpClient().newCall(request).enqueue(callback);
     }
 
-    public static void postAsync(String url, HashMap<String, String> params, Callback callback) {
+    public static void postAsync(String url, HashMap<String, String> params, String refererUrl, Callback callback) {
         // CLIENT.newBuilder().cookieJar(new CookiesManager());
         try {
             StringBuilder sb = new StringBuilder();
@@ -74,7 +90,7 @@ public class OkHttpHelper {
             String param = sb.toString();
             RequestBody body = RequestBody.create(MEDIA_TYPE_TEXT, param);
             // 创建请求
-            Request request = addHeaders().url(url).post(body).build();
+            Request request = addHeaders(refererUrl).url(url).post(body).build();
             getOKHttpClient().newCall(request).enqueue(callback);
 
         } catch (Exception e) {
@@ -82,15 +98,28 @@ public class OkHttpHelper {
         }
     }
 
-    private static Request.Builder addHeaders() {
+    private static Request.Builder addHeaders(String refererUrl) {
         Request.Builder builder = new Request.Builder()
-//               .addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36")
+//                .addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36")
 //                .addHeader("Accept-Encoding","gzip, deflate")
 //                .addHeader("Origin", "https://www.v2ex.com")
 //                .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .addHeader("Connection", "keep-alive");
+                  .addHeader("Cache-Control", "max-age=0")
+                  .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                  .addHeader("Accept-Charset", "utf-8, iso-8859-1, utf-16, *;q=0.7")
+                  .addHeader("Accept-Language", "zh-cn")
+//                  .addHeader("X-Requested-With", "com.android.browser")
+                  .addHeader("Host", "www.v2ex.com")
+                  .addHeader("Connection", "keep-alive");
+        if (!TextUtils.isEmpty(refererUrl)) {
+            builder.addHeader("Referer", refererUrl);
+        }
         return builder;
     }
+
+//    public static int randomOnce() {
+//        return (int)( Math.random() * 90000 +10000);
+//    }
 
     private Interceptor htmlInterceptor = new Interceptor() {
         @Override

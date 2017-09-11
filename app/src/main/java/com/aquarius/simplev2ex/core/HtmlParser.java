@@ -203,4 +203,26 @@ public class HtmlParser {
         }
         return params;
     }
+
+    // 解析主页中退出登录所需参数
+    public static int getSignOutOnceParam(String htmlStr) {
+        int once = 0;
+        try {
+            Document doc = Jsoup.parse(htmlStr);
+            Element body = doc.body();
+            Elements elements = body.getElementsByTag("a");
+            for (Element element : elements) {
+                if(element.attr("href").equalsIgnoreCase("#;")){
+                    String content = element.attr("onclick");
+                    String value = content.substring(content.lastIndexOf("?"), content.lastIndexOf("'"));
+                    once = Integer.parseInt(value.substring(6));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return once;
+        }
+        return once;
+    }
 }

@@ -42,7 +42,7 @@
     <string name="setting_label">应用设置</string>
     <string name="setting_title_label">偏好设置</string>
 
-    <string name="user_name">用户名或邮箱</string>
+    <string name="user_name">用户名</string>
     <string name="password">密码</string>
 
     <!-- 设置 -->

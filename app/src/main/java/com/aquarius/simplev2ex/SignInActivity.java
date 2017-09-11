@@ -1,5 +1,6 @@
 package com.aquarius.simplev2ex;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -12,6 +13,7 @@ import com.aquarius.simplev2ex.core.HtmlParser;
 import com.aquarius.simplev2ex.core.HttpRequestCallback;
 import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
+import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 
@@ -59,12 +61,12 @@ public class SignInActivity extends BaseActivity {
             }
         });
 
-        mPasswordView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPasswordView.setCursorVisible(true);
-            }
-        });
+//        mPasswordView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mPasswordView.setCursorVisible(true);
+//            }
+//        });
 
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +77,11 @@ public class SignInActivity extends BaseActivity {
                 if (TextUtils.isEmpty(mUsername)) {
                     MessageUtil.showMessageBar(SignInActivity.this, "账号为空，不合法" ,"");
                     return ;
+                }
+
+                if (mUsername.contains("@")) {
+                    MessageUtil.showMessageBar(SignInActivity.this, "暂不支持邮箱登录！", null);
+                    return;
                 }
 
                 mPassword = mPasswordView.getText().toString().trim();
@@ -113,7 +120,7 @@ public class SignInActivity extends BaseActivity {
             params.put("next", map.get("next"));
             params.put(map.get("username_key"),mUsername);
             params.put(map.get("password_key"), mPassword);
-            OkHttpHelper.postAsync(V2exManager.getSignInBaseUrl(), params,  new SignRequestCallback());
+            OkHttpHelper.postAsync(V2exManager.getSignInBaseUrl(), params, V2exManager.getSignInBaseUrl(), new SignRequestCallback());
             return null;
         }
 
@@ -138,13 +145,22 @@ public class SignInActivity extends BaseActivity {
 
         @Override
         public void onResponse(Call call, Response response) throws IOException {
-            if (response.code() == 302) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        MessageUtil.showMessageBar(mContext, "登录成功！", "");
-                    }
-                });
+            if (response.isSuccessful()) {
+                String result = response.body().string();
+                int once = HtmlParser.getSignOutOnceParam(result);
+                if (once > 0) {
+                    MessageUtil.showMessageBar(mContext, "登录成功！", "");
+                    V2exApplication.getInstance().setOnceValue(once);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent();
+                            intent.putExtra("username", mUsername);
+                            ((Activity)mContext).setResult(Constants.RESULT_CODE_SIGN_IN, intent);
+                            ((Activity) mContext).finish();
+                        }
+                    }, 1000);
+                }
             }
         }
     }

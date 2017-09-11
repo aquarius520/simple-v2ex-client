@@ -20,6 +20,7 @@ import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.entity.V2exUser;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.support.HeaderViewRecyclerAdapter;
+import com.aquarius.simplev2ex.util.PersistenceUtil;
 import com.aquarius.simplev2ex.util.GlideUtil;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
@@ -61,14 +62,16 @@ public class UserHomepageActivity extends BaseActivity {
     protected void handleIntent(Intent intent) {
         if (intent != null) {
             Member member = intent.getExtras().getParcelable("member");
-            username = member.getUsername();
-            userId = member.getId();
-            avatarUrl = member.getAvatar_large();
-            if (TextUtils.isEmpty(avatarUrl) && !TextUtils.isEmpty(member.getAvatar_normal())) {
-                avatarUrl = member.getAvatar_normal().replace("normal", "large");
-            }
-            if (!TextUtils.isEmpty(avatarUrl) && avatarUrl.startsWith("//")) {
-                avatarUrl = "http:" + avatarUrl;
+            if (member != null) {
+                username = member.getUsername();
+                userId = member.getId();
+                avatarUrl = member.getAvatar_large();
+                if (TextUtils.isEmpty(avatarUrl) && !TextUtils.isEmpty(member.getAvatar_normal())) {
+                    avatarUrl = member.getAvatar_normal().replace("normal", "large");
+                }
+                if (!TextUtils.isEmpty(avatarUrl) && avatarUrl.startsWith("//")) {
+                    avatarUrl = "http:" + avatarUrl;
+                }
             }
         }
     }
@@ -192,7 +195,7 @@ public class UserHomepageActivity extends BaseActivity {
                         .setAvatarLarge(user.getAvatar_large()).build();
 
                 // 更新member信息
-                startServiceUpdateMember(mContext, member);
+                PersistenceUtil.startServiceUpdateMember(mContext, member);
             }
         }
     }
@@ -233,7 +236,7 @@ public class UserHomepageActivity extends BaseActivity {
             data.remove(headerItem);
 
             if(data.size() == 0) return;
-            startServiceInsertTopics(mContext, data);
+            PersistenceUtil.startServiceInsertTopics(mContext, data);
         }
     }
 

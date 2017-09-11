@@ -139,4 +139,13 @@ public class V2exManager {
     public static String getSignInBaseUrl() {
         return BASE_HTTPS_URL + "/signin";
     }
+
+    public static String getSignOutBaseUrl() {
+        return BASE_HTTPS_URL + "/signout";
+    }
+
+    public static String getPostTopicBaseUrl(String nodeName) {
+        return BASE_HTTPS_URL + "/new/" + nodeName;
+    }
+
 }

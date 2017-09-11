@@ -13,6 +13,7 @@ import com.aquarius.simplev2ex.database.DataBaseManager;
 import com.aquarius.simplev2ex.entity.Node;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
+import com.aquarius.simplev2ex.util.PersistenceUtil;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
@@ -132,7 +133,7 @@ public class NodeTopicsActivity extends BaseActivity {
         public void onResponseSuccess(List<TopicItem> data) {
             topicListAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
-            startServiceInsertTopics(mContext, data);
+            PersistenceUtil.startServiceInsertTopics(mContext, data);
         }
     }
 
