@@ -34,6 +34,7 @@ public class Constants {
     public static final String ACTION_UPDATE = "update";
 
     public static final int RESULT_CODE_NODE = 1;
+    public static final int RESULT_CODE_SIGN_IN = 2;
 
     // preference 配置
     public static final String KEY_LAST_REFRESH_NODES_TIME = "last_refresh_nodes_time";

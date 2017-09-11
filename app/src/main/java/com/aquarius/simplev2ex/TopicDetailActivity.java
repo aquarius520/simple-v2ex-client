@@ -21,6 +21,7 @@ import com.aquarius.simplev2ex.entity.Reply;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.support.HeaderViewRecyclerAdapter;
+import com.aquarius.simplev2ex.util.PersistenceUtil;
 import com.aquarius.simplev2ex.util.GlideUtil;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
@@ -243,7 +244,7 @@ public class TopicDetailActivity extends BaseActivity {
                 contentTv.setRichText(topicContent);
                 // 更新topic内容
                 // 更新member id/avatar...等
-                startServiceUpdateTopic(mContext, item, topicId);
+                PersistenceUtil.startServiceUpdateTopic(mContext, item, topicId);
             }
         }
     }
@@ -272,7 +273,7 @@ public class TopicDetailActivity extends BaseActivity {
 
             if (data != null && mReplyCount < data.size()) {
                 mReplyCount = data.size();
-                startServiceInsertReplies(mContext, data, topicId);
+                PersistenceUtil.startServiceInsertReplies(mContext, data, topicId);
             }
             else {
                 MessageUtil.showMessageBar(TopicDetailActivity.this, "没有新的回复.", "");

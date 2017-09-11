@@ -1,13 +1,23 @@
 package com.aquarius.simplev2ex;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
+import com.aquarius.simplev2ex.core.V2exManager;
+import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 /**
  * Created by aquarius on 2017/9/10.
@@ -22,6 +32,8 @@ public class TopicPostActivity extends BaseActivity {
     private EditText mNodeNameView;
     private EditText mTopicTitleView;
     private EditText mTopicContentView;
+
+    private String mNodeName;
 
 
     @Override
@@ -66,7 +78,7 @@ public class TopicPostActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Constants.RESULT_CODE_NODE) {
-            String name = data.getStringExtra("name");
+            mNodeName = data.getStringExtra("name");
             String title = data.getStringExtra("title");
             mNodeNameView.setText(title);
         }
@@ -76,11 +88,11 @@ public class TopicPostActivity extends BaseActivity {
 
         @Override
         public void onClick(View v) {
-            String nodeName = mNodeNameView.getText().toString();
+            String nodeTitle = mNodeNameView.getText().toString();
             String title = mTopicTitleView.getText().toString();
             String content = mTopicContentView.getText().toString();
 
-            if (TextUtils.isEmpty(nodeName)) {
+            if (TextUtils.isEmpty(nodeTitle)) {
                 MessageUtil.showMessageBar(TopicPostActivity.this, "节点名为空，不合法", null);
                 return;
             }
@@ -90,6 +102,35 @@ public class TopicPostActivity extends BaseActivity {
                 return;
             }
 
+            LinkedHashMap<String, String> params = new LinkedHashMap<>();
+            params.put("title", title);
+            params.put("content", content);
+            //params.put("node_name",mNodeName);
+            params.put("syntax", "0");
+            params.put("once", V2exApplication.getInstance().onceValue()+"");
+            OkHttpHelper.postAsync(V2exManager.getPostTopicBaseUrl(mNodeName), params, "", new TopicPostRequest());
+        }
+    }
+
+    class TopicPostRequest implements okhttp3.Callback{
+
+        @Override
+        public void onFailure(Call call, IOException e) {
+
+        }
+
+        @Override
+        public void onResponse(Call call, Response response) throws IOException {
+            if (response.isSuccessful()) {
+                MessageUtil.showMessageBar(mContext, "话题创建成功！", "");
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((Activity)mContext).finish();
+                    }
+                }, 1000);
+
+            }
         }
     }
 }

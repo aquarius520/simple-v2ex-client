@@ -32,6 +32,10 @@ public class V2exApplication extends Application {
 
     private static V2exApplication context;
 
+    private boolean isLogin = false;
+
+    private int once = 0;
+
     public static V2exApplication getInstance() {
         return context;
     }
@@ -46,6 +50,22 @@ public class V2exApplication extends Application {
         }
     }
 
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void setLoginStatus(boolean login) {
+        isLogin = login;
+    }
+
+    public int onceValue() {
+        return once;
+    }
+
+    public void setOnceValue(int value) {
+        once = value;
+    }
+
     private void requestNodesAndSaveInTable() {
         if (NetWorkUtil.isConnected()) {
             OkHttpHelper.getAsync(V2exManager.getAllNodeInfoUrl(), new Callback() {
@@ -58,21 +78,26 @@ public class V2exApplication extends Application {
                 public void onResponse(Call call, Response response) throws IOException {
                     String result = response.body().string();
                     if (result != null && !result.equals("")) {
-                        Gson gson = new Gson();
-                        ArrayList<Node> nodes = gson.fromJson(result, new TypeToken<ArrayList<Node>>() {}.getType());
+                        try {
+                            Gson gson = new Gson();
+                            ArrayList<Node> nodes = gson.fromJson(result, new TypeToken<ArrayList<Node>>() {
+                            }.getType());
 
-                        // 启动Service写入node数据表中
-                        Intent intent = new Intent(context, DataService.class);
-                        intent.putExtra(Constants.DATA_SOURCE, "nodes");
-                        intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
-                        Bundle data = new Bundle();
-                        data.putParcelableArrayList("nodes", nodes);
-                        intent.putExtras(data);
-                        context.startService(intent);
+                            // 启动Service写入node数据表中
+                            Intent intent = new Intent(context, DataService.class);
+                            intent.putExtra(Constants.DATA_SOURCE, "nodes");
+                            intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_INSERT);
+                            Bundle data = new Bundle();
+                            data.putParcelableArrayList("nodes", nodes);
+                            intent.putExtras(data);
+                            context.startService(intent);
 
-                        // 保存记录，表示已经请求过，也可保存时间，间隔一段时间后再次请求做更新操作
-                        AppConfig.writeToPreference(context, Constants.KEY_LAST_REFRESH_NODES_TIME,
-                                System.currentTimeMillis());
+                            // 保存记录，表示已经请求过，也可保存时间，间隔一段时间后再次请求做更新操作
+                            AppConfig.writeToPreference(context, Constants.KEY_LAST_REFRESH_NODES_TIME,
+                                    System.currentTimeMillis());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
