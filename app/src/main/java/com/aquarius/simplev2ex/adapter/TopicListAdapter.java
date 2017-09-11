@@ -17,10 +17,12 @@ import com.aquarius.simplev2ex.R;
 import com.aquarius.simplev2ex.TopicDetailActivity;
 import com.aquarius.simplev2ex.UserHomepageActivity;
 import com.aquarius.simplev2ex.entity.TopicItem;
+import com.aquarius.simplev2ex.support.ListItemComparator;
 import com.aquarius.simplev2ex.util.GlideUtil;
 import com.aquarius.simplev2ex.util.TimeUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cn.bingoogolapple.badgeview.BGABadgeView;
@@ -166,6 +168,7 @@ public class TopicListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 if(exist) continue;
                 data.add(item);
             }
+            Collections.sort(data, new ListItemComparator());
         }
         mTopics = data;
         //TODO: List的源码中为何观察者模式，为何调用notifyDataSetChanged();会引起数据源改变和刷新UI

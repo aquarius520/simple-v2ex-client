@@ -21,11 +21,13 @@ import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.database.DataBaseManager;
 import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
+import com.aquarius.simplev2ex.support.ListItemComparator;
 import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -123,6 +125,7 @@ public class TopicListPagerAdapter extends PagerAdapter {
 
         @Override
         public void onResponseSuccess(List<TopicItem> data) {
+
             adapter.update(data, true);
             refreshLayout.setRefreshing(false);
 

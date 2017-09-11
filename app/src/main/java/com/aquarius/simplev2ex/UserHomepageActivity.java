@@ -20,6 +20,7 @@ import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.entity.V2exUser;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.support.HeaderViewRecyclerAdapter;
+import com.aquarius.simplev2ex.support.ListItemComparator;
 import com.aquarius.simplev2ex.util.PersistenceUtil;
 import com.aquarius.simplev2ex.util.GlideUtil;
 import com.aquarius.simplev2ex.util.MessageUtil;
@@ -29,6 +30,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -151,6 +154,9 @@ public class UserHomepageActivity extends BaseActivity {
 
         mTopics = DataBaseManager.init().queryTopicByMember(username);
         if (!force && mTopics != null && mTopics.size() > 0) {
+
+            Collections.sort(mTopics, new ListItemComparator());
+
             topicListAdapter.update(mTopics, false);
             refreshLayout.setRefreshing(false);
         } else if (NetWorkUtil.isConnected()) {
@@ -228,6 +234,7 @@ public class UserHomepageActivity extends BaseActivity {
             }
             headerItem = new TopicItem.Builder(0, "header").build();
             data.add(0, headerItem);
+
             topicListAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
 
