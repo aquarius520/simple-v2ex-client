@@ -148,6 +148,17 @@ public class SignInActivity extends BaseActivity {
             if (response.isSuccessful()) {
                 String result = response.body().string();
                 int once = HtmlParser.getSignOutOnceParam(result);
+                final String problem = HtmlParser.getSignProblemLabel(result);
+                if (!TextUtils.isEmpty(problem)) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLoginButton.setText(getResources().getString(R.string.sign_in_title));
+                            MessageUtil.showMessageBar(mContext, problem, "");
+                        }
+                    });
+                    return;
+                }
                 if (once > 0) {
                     MessageUtil.showMessageBar(mContext, "登录成功！", "");
                     V2exApplication.getInstance().setOnceValue(once);

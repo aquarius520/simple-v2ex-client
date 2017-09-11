@@ -225,4 +225,27 @@ public class HtmlParser {
         }
         return once;
     }
+
+    // 得到登录出错的提示
+    public static String getSignProblemLabel(String htmlStr) {
+        String problem = null;
+        try {
+            Document doc = Jsoup.parse(htmlStr);
+            Element body = doc.body();
+            Elements elements = body.getElementsByAttributeValue("class", "problem");
+            for (Element e : elements) {
+                Elements lis = e.getElementsByTag("li");
+                for (Element li : lis) {
+                    if (problem != null && problem.length() != 0) {
+                        break;
+                    }
+                    problem = li.text();
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return problem;
+    }
 }
