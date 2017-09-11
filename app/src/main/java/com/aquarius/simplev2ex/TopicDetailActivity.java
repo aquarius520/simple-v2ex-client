@@ -1,6 +1,7 @@
 package com.aquarius.simplev2ex;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -68,6 +69,7 @@ public class TopicDetailActivity extends BaseActivity {
 
     private List<Reply> mReplies;
     private int mReplyCount;
+    private int mFavoriteStatus;
 
 
     @Override
@@ -127,7 +129,11 @@ public class TopicDetailActivity extends BaseActivity {
 
     @Override
     protected void bindDataAndSetListeners() {
+
         super.displayTitleTopbar(titleTopBar, getResources().getString(R.string.topic_detail_text));
+        super.displayActionTopbar(titleTopBar, getResources().getString(R.string.favorite), new FavoriteTextClickListener());
+
+        queryTopicFavoriteStatus();
 
         avatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,7 +174,7 @@ public class TopicDetailActivity extends BaseActivity {
         mHeadAdapter = new HeaderViewRecyclerAdapter(mRepliesAdapter);
         mHeadAdapter.addHeaderView(mHeader);
         mRecyclerView.setAdapter(mHeadAdapter);
-        
+
     }
 
     private void startUserHomePageActivity() {
@@ -177,6 +183,77 @@ public class TopicDetailActivity extends BaseActivity {
         data.putParcelable("member", member);
         intent.putExtras(data);
         startActivity(intent);
+    }
+
+    private class FavoriteTextClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            handleFavoriteOrCancelAction();
+        }
+    }
+
+    private void queryTopicFavoriteStatus() {
+        if (topicId != 0) {
+            Cursor cursor = null;
+            try {
+                cursor = DataBaseManager.init().queryFavoriteTopic(topicId);
+                if (cursor != null && cursor.moveToFirst()) {
+                    mFavoriteStatus = cursor.getInt(0);
+                    if (mFavoriteStatus == 1) {
+                        titleTopBar.setActionText(getResources().getString(R.string.unfavorite));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+    }
+
+    private void handleFavoriteOrCancelAction() {
+        if (mFavoriteStatus == 0) {
+            // 加入收藏
+            Cursor cursor = null;
+            try {
+                cursor = DataBaseManager.init().queryFavoriteTopic(topicId);
+                if (cursor != null && cursor.getCount() > 0) {
+                    // 说明db中已经存在此话题,更新收藏字段即可
+                    boolean succeed = DataBaseManager.init().updateFavoriteTopic(topicId, 1);
+                    if (succeed) {
+                        titleTopBar.setActionText(getResources().getString(R.string.unfavorite));
+                        mFavoriteStatus = 1;
+                    }
+                } else {
+                    // db中没有此话题， 先插入话题， 再更新状态
+                    List<Member> list = new ArrayList<>();
+                    list.add(member);
+                    boolean succeed = DataBaseManager.init().insertList(list, "members", 0);
+                    if (succeed) {
+                        boolean favorite = DataBaseManager.init().updateFavoriteTopic(topicId, 1);
+                        if(favorite) {
+                            titleTopBar.setActionText(getResources().getString(R.string.unfavorite));
+                            mFavoriteStatus = 1;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        } else if (mFavoriteStatus == 1) {
+            // 已经是收藏状态，db中必然存在数据
+           boolean succeed = DataBaseManager.init().updateFavoriteTopic(topicId, 0);
+            if(succeed) {
+                titleTopBar.setActionText(getResources().getString(R.string.favorite));
+                mFavoriteStatus = 0;
+            }
+        }
     }
 
     @Override

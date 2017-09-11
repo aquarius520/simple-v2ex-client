@@ -13,7 +13,6 @@ import com.aquarius.simplev2ex.util.MessageUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import okhttp3.Call;
@@ -64,7 +63,7 @@ public class TopicPostActivity extends BaseActivity {
         mNodeNameView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(TopicPostActivity.this, NodeListActivity.class);
+                Intent intent = new Intent(TopicPostActivity.this, NodeSearchListActivity.class);
                 startActivityForResult(intent, REQUEST_NODE_NAME_CODE);
             }
         });

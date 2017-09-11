@@ -14,7 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
 
     public static final String DATABASE_NAME = "v2ex.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     // member 成员表
     public static final String TABLE_MEMBER_NAME = "member";
@@ -55,6 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TOPIC_LAST_MODIFIED = "last_modified";
     public static final String TOPIC_LAST_TOUCHED = "last_touched";
     public static final String TOPIC_TYPE_FLAG = "type";    // new add  version=2
+    public static final String TOPIC_FAVORITE = "favorite"; // 0 未收藏， 1 收藏
 
     public static final String CREATE_TABLE_TOPIC_SQL = "CREATE TABLE " + TABLE_TOPIC_NAME +
             " ( " +
@@ -73,6 +74,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String ALTER_TABLE_TOPIC_SQL = "ALTER TABLE " + TABLE_TOPIC_NAME +
             " ADD COLUMN " + TOPIC_TYPE_FLAG + " TEXT NOT NULL DEFAULT '' ";
+
+    public static final String ALTER_TOPIC_FAVORITE_SQL = "ALTER TABLE " + TABLE_TOPIC_NAME +
+            " ADD COLUMN " + TOPIC_FAVORITE + " INTEGER DEFAULT 0 ";
 
     // reply 回复表
     public static final String TABLE_REPLY_NAME = "reply";
@@ -143,6 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_NODE_SQL);
 
         db.execSQL(ALTER_TABLE_TOPIC_SQL);
+        db.execSQL(ALTER_TOPIC_FAVORITE_SQL);
     }
 
 
@@ -151,10 +156,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion == 1 && newVersion == 2) {
             upgradeToVersion2(db);
         }
+        if (oldVersion == 2 && newVersion == 3) {
+            upgradeToVersion3(db);
+        }
+
     }
 
     private void upgradeToVersion2(SQLiteDatabase db) {
         db.execSQL(ALTER_TABLE_TOPIC_SQL);
+    }
+
+    private void upgradeToVersion3(SQLiteDatabase db) {
+        db.execSQL(ALTER_TOPIC_FAVORITE_SQL);
     }
 
     @Override

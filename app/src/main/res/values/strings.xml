@@ -45,6 +45,13 @@
     <string name="user_name">用户名</string>
     <string name="password">密码</string>
 
+
+    <string name="favorite">收藏</string>
+    <string name="favorited">已收藏</string>
+    <string name="favoriting">收藏中...</string>
+    <string name="unfavorite">取消收藏</string>
+
+
     <!-- 设置 -->
     <string name="setting_main">常规设置</string>
     <string name="setting_show_img_only_wifi">无图模式</string>

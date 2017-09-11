@@ -43,7 +43,9 @@
 
         <activity android:name=".TopicPostActivity" android:screenOrientation="portrait"/>
 
-        <activity android:name=".NodeListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".NodeSearchListActivity" android:screenOrientation="portrait"/>
+
+        <activity android:name=".FavoriteTopicActivity" android:screenOrientation="portrait"/>
 
         <service android:name=".core.DataService"/>
 

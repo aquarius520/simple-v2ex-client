@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by aquarius on 2017/9/10.
  */
-public class NodeListActivity extends BaseActivity {
+public class NodeSearchListActivity extends BaseActivity {
 
 
     private static final int REQUEST_NODE_NAME_CODE = 100;

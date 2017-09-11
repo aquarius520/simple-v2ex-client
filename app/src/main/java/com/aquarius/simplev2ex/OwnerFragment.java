@@ -106,6 +106,14 @@ public class OwnerFragment extends Fragment {
             }
         });
 
+        mFavoriteTopicLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, FavoriteTopicActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mPostTopicLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

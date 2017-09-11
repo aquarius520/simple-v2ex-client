@@ -11,16 +11,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.aquarius.simplev2ex.core.DataService;
-import com.aquarius.simplev2ex.entity.Member;
-import com.aquarius.simplev2ex.entity.Reply;
-import com.aquarius.simplev2ex.entity.TopicItem;
 import com.aquarius.simplev2ex.support.ItemAnimationUtil;
-import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.views.TitleTopBar;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by aquarius on 2017/9/8.

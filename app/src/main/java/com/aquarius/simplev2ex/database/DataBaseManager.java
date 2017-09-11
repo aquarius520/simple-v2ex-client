@@ -258,7 +258,7 @@ public class DataBaseManager {
      * @param wholeMatch 是否完整匹配
      */
     //TODO: 仅显示结果集中最后一天之内的话题
-    public List<TopicItem> queryTopics(String key, String type,  boolean wholeMatch) {
+    public List<TopicItem> queryTopics(String key, String type, boolean wholeMatch) {
         List<TopicItem> topics = new ArrayList<>();
         if (TextUtils.isEmpty(key)) {
             return topics;
@@ -274,6 +274,8 @@ public class DataBaseManager {
                     selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_NODE_NAME + "= ?";
                 } else if (type.equals("member")) {
                     selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_MEMBER_NAME + "= ?";
+                } else if (type.equals("favourite")) {
+                    selection = DatabaseHelper.TABLE_TOPIC_NAME + "." + DatabaseHelper.TOPIC_FAVORITE + "= ?";
                 }
                 StringBuilder sb = new StringBuilder();
                 sb.append("SELECT ")
@@ -338,6 +340,28 @@ public class DataBaseManager {
             if(db != null) db.close();
         }
         return topics;
+    }
+
+    public Cursor queryFavoriteTopic(int topicId) {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        String sql = "SELECT " + DatabaseHelper.TOPIC_FAVORITE + " FROM " + DatabaseHelper.TABLE_TOPIC_NAME +
+                " WHERE " + DatabaseHelper.TOPIC_ID + "=?";
+        if (db != null) {
+            return db.rawQuery(sql, new String[]{topicId + ""});
+        }
+        return null;
+    }
+
+    public boolean updateFavoriteTopic(int topicId, int status) {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.TOPIC_FAVORITE, status);
+        int count = 0;
+        if(db != null) {
+            count = db.update(DatabaseHelper.TABLE_TOPIC_NAME, values, DatabaseHelper.TOPIC_ID + "=?", new String[]{topicId + ""});
+            db.close();
+        }
+        return  count > 0;
     }
 
     public List<Reply> queryReplies(int topicId) {
