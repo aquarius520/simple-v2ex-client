@@ -160,6 +160,7 @@ public class UserHomepageActivity extends BaseActivity {
             topicListAdapter.update(mTopics, false);
             refreshLayout.setRefreshing(false);
         } else if (NetWorkUtil.isConnected()) {
+            refreshLayout.setRefreshing(true);
             OkHttpHelper.getAsync(V2exManager.getTopicsOfUserUrl(username), new TopicsFromUserRequest(mHandler));
         } else {
             refreshLayout.setRefreshing(false);
@@ -220,7 +221,7 @@ public class UserHomepageActivity extends BaseActivity {
 
         @Override
         public void onResponseFailure(String error) {
-
+            refreshLayout.setRefreshing(false);
         }
 
         @Override
