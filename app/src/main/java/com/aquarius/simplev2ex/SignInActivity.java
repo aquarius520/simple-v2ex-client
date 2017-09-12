@@ -15,6 +15,7 @@ import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.MessageUtil;
+import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 
 import java.io.IOException;
@@ -90,7 +91,12 @@ public class SignInActivity extends BaseActivity {
                     return ;
                 }
 
-                OkHttpHelper.getAsync(V2exManager.getSignInBaseUrl(), new SignParamsRequestCallback(mHandler));
+                if (NetWorkUtil.isConnected()) {
+                    OkHttpHelper.getAsync(V2exManager.getSignInBaseUrl(), new SignParamsRequestCallback(mHandler));
+                } else {
+                    MessageUtil.showNetworkErrorMsg(mContext, mContext.getResources().getString(R.string.network_error),
+                            mContext.getResources().getString(R.string.network_error_label));
+                }
             }
         });
     }
