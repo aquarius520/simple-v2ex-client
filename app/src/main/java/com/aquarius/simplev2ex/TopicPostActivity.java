@@ -10,6 +10,7 @@ import com.aquarius.simplev2ex.core.V2exManager;
 import com.aquarius.simplev2ex.network.OkHttpHelper;
 import com.aquarius.simplev2ex.util.Constants;
 import com.aquarius.simplev2ex.util.MessageUtil;
+import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 
 import java.io.IOException;
@@ -107,7 +108,13 @@ public class TopicPostActivity extends BaseActivity {
             //params.put("node_name",mNodeName);
             params.put("syntax", "0");
             params.put("once", V2exApplication.getInstance().onceValue()+"");
-            OkHttpHelper.postAsync(V2exManager.getPostTopicBaseUrl(mNodeName), params, "", new TopicPostRequest());
+
+            if (NetWorkUtil.isConnected()) {
+                OkHttpHelper.postAsync(V2exManager.getPostTopicBaseUrl(mNodeName), params, "", new TopicPostRequest());
+            } else {
+                MessageUtil.showNetworkErrorMsg(mContext, mContext.getResources().getString(R.string.network_error),
+                        mContext.getResources().getString(R.string.network_error_label));
+            }
         }
     }
 
