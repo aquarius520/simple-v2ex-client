@@ -27,6 +27,8 @@ import com.aquarius.simplev2ex.util.GlideUtil;
 import com.aquarius.simplev2ex.util.NetWorkUtil;
 import com.google.gson.Gson;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +47,14 @@ public class OwnerFragment extends Fragment {
     private View mSettingLayout;
     private TextView mSignInLayout;
     private ImageView mAvatarLayout;
-    private View mPostTopicLayout;
-    private View mFavoriteNodeLayout;
-    private View mFavoriteTopicLayout;
+    private TextView mPostTopicTv;
+    private TextView mFavoriteNodeTv;
+    private TextView mFavoriteTopicTv;
     private View mSignOutLayout;
+
+    private ViewGroup mPostTopicContainer;
+    private ViewGroup mFavoriteTopicContainer;
+    private ViewGroup mFavoriteNodeContainer;
 
     private Handler mHandler;
     private Member member;
@@ -72,9 +78,12 @@ public class OwnerFragment extends Fragment {
         mSignInLayout = (TextView) view.findViewById(R.id.sign_in);
         mSettingLayout = view.findViewById(R.id.settings);
         mAvatarLayout = (ImageView) view.findViewById(R.id.avatar);
-        mPostTopicLayout = view.findViewById(R.id.post_topic);
-        mFavoriteNodeLayout = view.findViewById(R.id.favorite_node);
-        mFavoriteTopicLayout = view.findViewById(R.id.favorite_topic);
+        mPostTopicContainer = (ViewGroup) view.findViewById(R.id.post_topic_container);
+        mPostTopicTv = (TextView) view.findViewById(R.id.post_topic);
+        mFavoriteTopicContainer = (ViewGroup) view.findViewById(R.id.favorite_topic_container);
+        mFavoriteNodeTv = (TextView) view.findViewById(R.id.favorite_node);
+        mFavoriteNodeContainer = (ViewGroup) view.findViewById(R.id.favorite_node_container);
+        mFavoriteTopicTv = (TextView) view.findViewById(R.id.favorite_topic);
         mSignOutLayout = view.findViewById(R.id.signout);
 
         mAvatarLayout.setOnClickListener(new View.OnClickListener() {
@@ -106,23 +115,31 @@ public class OwnerFragment extends Fragment {
             }
         });
 
-        mFavoriteTopicLayout.setOnClickListener(new View.OnClickListener() {
+        mFavoriteTopicContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, FavoriteTopicActivity.class);
-                startActivity(intent);
+                if(V2exApplication.getInstance().isLogin()) {
+                    Intent intent = new Intent(mContext, FavoriteTopicActivity.class);
+                    startActivity(intent);
+                }else {
+                    MessageUtil.showMessageBar(mContext, "尚未登陆, 登陆后查看！", "");
+                }
             }
         });
 
-        mFavoriteNodeLayout.setOnClickListener(new View.OnClickListener() {
+        mFavoriteNodeContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, FavoriteNodeActivity.class);
-                startActivity(intent);
+                if(V2exApplication.getInstance().isLogin()) {
+                    Intent intent = new Intent(mContext, FavoriteNodeActivity.class);
+                    startActivity(intent);
+                }else {
+                    MessageUtil.showMessageBar(mContext, "尚未登陆, 登陆后查看！", "");
+                }
             }
         });
 
-        mPostTopicLayout.setOnClickListener(new View.OnClickListener() {
+        mPostTopicContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!V2exApplication.getInstance().isLogin()) {

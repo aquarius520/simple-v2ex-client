@@ -41,8 +41,11 @@
         android:background="#EAEAEA"/>
 
     <RelativeLayout
+        android:id="@+id/post_topic_container"
         android:layout_width="match_parent"
-        android:layout_height="48dp">
+        android:layout_height="48dp"
+        android:background="@drawable/owner_item_bg_selector"
+        >
         <TextView
             android:id="@+id/post_topic"
             android:layout_width="match_parent"
@@ -70,8 +73,10 @@
         android:background="#EAEAEA"/>
 
     <RelativeLayout
+        android:id="@+id/favorite_topic_container"
         android:layout_width="match_parent"
-        android:layout_height="48dp">
+        android:layout_height="48dp"
+        android:background="@drawable/owner_item_bg_selector">
         <TextView
             android:id="@+id/favorite_topic"
             android:layout_width="match_parent"
@@ -99,8 +104,10 @@
         android:background="#EAEAEA"/>
 
     <RelativeLayout
+        android:id="@+id/favorite_node_container"
         android:layout_width="match_parent"
-        android:layout_height="48dp">
+        android:layout_height="48dp"
+        android:background="@drawable/owner_item_bg_selector">
         <TextView
             android:id="@+id/favorite_node"
             android:layout_width="match_parent"
@@ -132,6 +139,7 @@
         android:id="@+id/signout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:background="@drawable/owner_item_bg_selector"
         android:visibility="gone"
         >
         <TextView
@@ -161,6 +169,7 @@
     <RelativeLayout
         android:id="@+id/settings"
         android:layout_width="match_parent"
+        android:background="@drawable/owner_item_bg_selector"
         android:layout_height="48dp">
         <TextView
             android:layout_width="match_parent"
