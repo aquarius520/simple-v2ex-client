@@ -47,6 +47,8 @@
 
         <activity android:name=".FavoriteTopicActivity" android:screenOrientation="portrait"/>
 
+        <activity android:name=".FavoriteNodeActivity" android:screenOrientation="portrait"/>
+
         <service android:name=".core.DataService"/>
 
         <activity android:name=".testlibs.TestActivity" android:screenOrientation="portrait">

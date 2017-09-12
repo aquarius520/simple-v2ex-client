@@ -89,6 +89,10 @@ public class DataService extends IntentService {
                 Member member = intent.getExtras().getParcelable("member");
                 DataBaseManager.init().updateMember(member, member.getUsername());
             }
+            else if(source.equals("node")) {
+                Node node = intent.getExtras().getParcelable("node");
+                DataBaseManager.init().updateNode(node, node.getName());
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.aquarius.simplev2ex.core.DataService;
 import com.aquarius.simplev2ex.entity.Member;
+import com.aquarius.simplev2ex.entity.Node;
 import com.aquarius.simplev2ex.entity.Reply;
 import com.aquarius.simplev2ex.entity.TopicItem;
 
@@ -55,6 +56,16 @@ public class PersistenceUtil {
         intent.putExtra(Constants.DATA_SOURCE, "member");
         intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_UPDATE);
         bundle.putParcelable("member", member);
+        intent.putExtras(bundle);
+        context.startService(intent);
+    }
+
+    public static void startServiceUpdateNode(Context context, Node node) {
+        Intent intent = new Intent(context, DataService.class);
+        Bundle bundle = new Bundle();
+        intent.putExtra(Constants.DATA_SOURCE, "node");
+        intent.putExtra(Constants.DATA_ACTION, Constants.ACTION_UPDATE);
+        bundle.putParcelable("node", node);
         intent.putExtras(bundle);
         context.startService(intent);
     }

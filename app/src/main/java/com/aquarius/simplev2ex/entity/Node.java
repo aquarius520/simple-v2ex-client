@@ -22,6 +22,7 @@ public class Node implements Parcelable, Serializable{
     private String avatar_mini;     // 小头像地址(不包括协议头)
     private String avatar_normal;   // 正常大小头像
     private String avatar_large;    // 大头像
+    private long created;
 
     private Node(Builder builder) {
         this.id = builder.id;
@@ -37,7 +38,7 @@ public class Node implements Parcelable, Serializable{
     }
 
     public Node(int id, String name, String title, String title_alternative, String url, int topics,
-                String avatar_mini, String avatar_normal, String avatar_large) {
+                String avatar_mini, String avatar_normal, String avatar_large, long created) {
         this.id = id;
         this.name = name;
         this.title = title;
@@ -47,6 +48,7 @@ public class Node implements Parcelable, Serializable{
         this.avatar_mini = avatar_mini;
         this.avatar_normal = avatar_normal;
         this.avatar_large = avatar_large;
+        this.created = created;
     }
 
     protected Node(Parcel in) {
@@ -145,6 +147,10 @@ public class Node implements Parcelable, Serializable{
         this.avatar_large = avatar_large;
     }
 
+    public long getCreated() {
+        return created;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -211,6 +217,7 @@ public class Node implements Parcelable, Serializable{
         private String avatar_mini;     // optional
         private String avatar_normal;   // optional
         private String avatar_large;    // optional
+        private long created;
 
         public Builder(String name, String title) {
             this.name = name;
@@ -257,6 +264,11 @@ public class Node implements Parcelable, Serializable{
 
         public Builder setAvatarLarge(String avatar_large) {
             this.avatar_large = avatar_large;
+            return this;
+        }
+
+        public Builder created(long created) {
+            this.created = created;
             return this;
         }
 

@@ -193,6 +193,26 @@ public class DataBaseManager {
         return count > 0;
     }
 
+    public boolean updateNode(Node node, String name) {
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.NODE_AVATAR_LARGE, node.getAvatar_large());
+        values.put(DatabaseHelper.NODE_CREATED, node.getCreated());
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        int count = 0;
+        try {
+            if (db != null) {
+                count = db.update(DatabaseHelper.TABLE_NODE_NAME, values, DatabaseHelper.NODE_NAME + "=?", new String[]{name});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (db != null) db.close();
+        }
+        return count > 0;
+
+    }
+
     public synchronized Member queryMember(String name) {
         SQLiteDatabase db = null;
         try {
@@ -220,7 +240,7 @@ public class DataBaseManager {
         return null;
     }
 
-    public List<Node> queryNodes(String key, boolean allMatch) {
+    public List<Node> queryNodes(String key, String type, boolean whole) {
         List<Node> nodes = new ArrayList<>();
         if(TextUtils.isEmpty(key)) {
             return nodes;
@@ -228,18 +248,33 @@ public class DataBaseManager {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         try {
             if (db != null) {
+                String selection = "";
+                String[] selectionArgs = null;
+                String[] columns = null;
+                if (type.equals("name") || type.equals("title")) {
+                    selection = DatabaseHelper.NODE_NAME + " LIKE ? OR " + DatabaseHelper.NODE_TITLE + " LIKE ?";
+                    selectionArgs = new String[]{"%"+key+"%", "%"+key+"%"};
+                }
+                if (type.equals("favorite")) {
+                    selection = DatabaseHelper.NODE_FAVORITE + " = ?";
+                    selectionArgs = new String[]{key};
+                }
                 String tableName = DatabaseHelper.TABLE_NODE_NAME;
-                String[] columns = new String[]{ DatabaseHelper.NODE_NAME, DatabaseHelper.NODE_TITLE};
-                String selection = DatabaseHelper.NODE_NAME + " LIKE ? OR " + DatabaseHelper.NODE_TITLE + " LIKE ?";
-                String[] selectionArgs = new String[]{"%"+key+"%", "%"+key+"%"};
+                // String[] columns = new String[]{ DatabaseHelper.NODE_NAME, DatabaseHelper.NODE_TITLE};
+                //String selection = DatabaseHelper.NODE_NAME + " LIKE ? OR " + DatabaseHelper.NODE_TITLE + " LIKE ?";
                 String orderBy = DatabaseHelper.NODE_NAME;
-                if(allMatch) {
+                if(whole) {
                     orderBy = DatabaseHelper.NODE_TOPICS + " DESC";
                 }
-                Cursor cursor = db.query(tableName, columns, allMatch ? null : selection,
-                         allMatch ? null : selectionArgs, null, null, orderBy, null);
+                Cursor cursor = db.query(tableName, columns, whole ? null : selection,
+                        whole ? null : selectionArgs, null, null, orderBy, null);
                 while (cursor.moveToNext()) {
-                    Node node = new Node.Builder(cursor.getString(0), cursor.getString(1)).build();
+                    String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.NODE_NAME));
+                    String title = cursor.getString(cursor.getColumnIndex(DatabaseHelper.NODE_TITLE));
+                    String url = cursor.getString(cursor.getColumnIndex(DatabaseHelper.NODE_URL));
+                    long created = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.NODE_CREATED));
+                    String avatar = cursor.getString(cursor.getColumnIndex(DatabaseHelper.NODE_AVATAR_LARGE));
+                    Node node = new Node.Builder(name, title).setUrl(url).setAvatarLarge(avatar).created(created).build();
                     nodes.add(node);
                 }
             }
@@ -359,6 +394,28 @@ public class DataBaseManager {
         int count = 0;
         if(db != null) {
             count = db.update(DatabaseHelper.TABLE_TOPIC_NAME, values, DatabaseHelper.TOPIC_ID + "=?", new String[]{topicId + ""});
+            db.close();
+        }
+        return  count > 0;
+    }
+
+    public Cursor queryFavoriteNode(String nodeName) {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        String sql = "SELECT " + DatabaseHelper.TOPIC_FAVORITE + " FROM " + DatabaseHelper.TABLE_NODE_NAME +
+                " WHERE " + DatabaseHelper.NODE_NAME + "=?";
+        if (db != null) {
+            return db.rawQuery(sql, new String[]{nodeName});
+        }
+        return null;
+    }
+
+    public boolean updateFavoriteNode(String nodeName, int status) {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.TOPIC_FAVORITE, status);
+        int count = 0;
+        if(db != null) {
+            count = db.update(DatabaseHelper.TABLE_NODE_NAME, values, DatabaseHelper.NODE_NAME + "=?", new String[]{nodeName});
             db.close();
         }
         return  count > 0;

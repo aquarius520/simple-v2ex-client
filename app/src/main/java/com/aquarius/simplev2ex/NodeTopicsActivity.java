@@ -1,10 +1,12 @@
 package com.aquarius.simplev2ex;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.aquarius.simplev2ex.adapter.TopicListAdapter;
 import com.aquarius.simplev2ex.core.HttpRequestCallback;
@@ -20,7 +22,13 @@ import com.aquarius.simplev2ex.views.TitleTopBar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by aquarius on 2017/9/4.
@@ -39,14 +47,17 @@ public class NodeTopicsActivity extends BaseActivity {
 
     private TopicListAdapter topicListAdapter;
     private List<TopicItem> mTopics;
+    private Node mNode;
+    private int mFavoriteStatus;
+
 
     @Override
     protected void handleIntent(Intent intent) {
         if (intent != null) {
-            Node node = intent.getExtras().getParcelable("node");
-            nodeId = node.getId();
-            nodeName = node.getName();
-            nodeTitle = node.getTitle();
+            mNode = intent.getExtras().getParcelable("node");
+            nodeId = mNode.getId();
+            nodeName = mNode.getName();
+            nodeTitle = mNode.getTitle();
         }
     }
 
@@ -73,6 +84,9 @@ public class NodeTopicsActivity extends BaseActivity {
     @Override
     protected void bindDataAndSetListeners() {
         super.displayTitleTopbar(titleTopBar, nodeTitle);
+        super.displayActionTopbar(titleTopBar, getResources().getString(R.string.favorite), new FavoriteNodeClickListener());
+
+        queryNodeFavoriteStatus();
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -83,6 +97,105 @@ public class NodeTopicsActivity extends BaseActivity {
         });
         topicListAdapter = new TopicListAdapter(this);
         recyclerView.setAdapter(topicListAdapter);
+    }
+
+    private void queryNodeFavoriteStatus(){
+        if (!TextUtils.isEmpty(nodeName)) {
+            Cursor cursor = null;
+            try {
+                cursor = DataBaseManager.init().queryFavoriteNode(nodeName);
+                if (cursor != null && cursor.moveToFirst()) {
+                    mFavoriteStatus = cursor.getInt(0);
+                    if (mFavoriteStatus == 1) {
+                        titleTopBar.setActionText(getResources().getString(R.string.unfavorite));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+    }
+
+    class FavoriteNodeClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            handleFavoriteOrCancelAction();
+        }
+    }
+
+
+    private void handleFavoriteOrCancelAction() {
+        if (mFavoriteStatus == 0) {
+            // 加入收藏
+            Cursor cursor = null;
+            try {
+                cursor = DataBaseManager.init().queryFavoriteNode(nodeName);
+                if (cursor != null && cursor.getCount() > 0) {
+                    // 说明db中已经存在此节点,更新收藏字段即可
+                    boolean succeed = DataBaseManager.init().updateFavoriteNode(nodeName, 1);
+                    if (succeed) {
+                        titleTopBar.setActionText(getResources().getString(R.string.unfavorite));
+                        mFavoriteStatus = 1;
+                        // 发起节点图请求
+                        requestNodeInfo(nodeName);
+                    }
+                } else {
+                    // db中没有此节点， 先插入节点， 再更新状态
+                    List<Node> list = new ArrayList<>();
+                    list.add(mNode);
+                    boolean succeed = DataBaseManager.init().insertList(list, "nodes", 0);
+                    if (succeed) {
+                        boolean favorite = DataBaseManager.init().updateFavoriteNode(nodeName, 1);
+                        if(favorite) {
+                            titleTopBar.setActionText(getResources().getString(R.string.unfavorite));
+                            mFavoriteStatus = 1;
+                            requestNodeInfo(nodeName);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        } else if (mFavoriteStatus == 1) {
+            // 已经是收藏状态，db中必然存在数据
+            boolean succeed = DataBaseManager.init().updateFavoriteNode(nodeName, 0);
+            if(succeed) {
+                titleTopBar.setActionText(getResources().getString(R.string.favorite));
+                mFavoriteStatus = 0;
+            }
+        }
+    }
+
+    private void requestNodeInfo(String nodeName) {
+        if (NetWorkUtil.isConnected()) {
+            OkHttpHelper.getAsync(V2exManager.getNodeInfoUrl(nodeName), new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        try {
+                           String result = response.body().string();
+                            Node node = new Gson().fromJson(result, Node.class);
+                            PersistenceUtil.startServiceUpdateNode(mContext, node);
+                        } catch (Exception e) {
+                            e.printStackTrace();;
+                        }
+                    }
+                }
+            });
+        }
     }
 
     @Override

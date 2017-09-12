@@ -66,7 +66,7 @@ public class NodeSearchListActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                List<Node> nodes = DataBaseManager.init().queryNodes(s.toString(), false);
+                List<Node> nodes = DataBaseManager.init().queryNodes(s.toString(), "name", false);
                 mListView.setVisibility(View.VISIBLE);
                 mNodeAdapter = new SearchNodeAdapter(mContext, nodes, true);
                 mListView.setAdapter(mNodeAdapter);
@@ -86,7 +86,7 @@ public class NodeSearchListActivity extends BaseActivity {
         new AsyncTask<Void, Void, List<Node>>() {
             @Override
             protected List<Node> doInBackground(Void... params) {
-                mNodes = DataBaseManager.init().queryNodes("allMatch", true);
+                mNodes = DataBaseManager.init().queryNodes("allMatch", "", true);
                 return mNodes;
             }
 

@@ -78,7 +78,7 @@ public class AllNodesFragment extends BaseFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                List<Node> nodes = DataBaseManager.init().queryNodes(s.toString() , false);
+                List<Node> nodes = DataBaseManager.init().queryNodes(s.toString(), "name" , false);
                 nodeListView.setVisibility(View.VISIBLE);
                 searchNodeAdapter = new SearchNodeAdapter(mContext, nodes, false);
                 nodeListView.setAdapter(searchNodeAdapter);

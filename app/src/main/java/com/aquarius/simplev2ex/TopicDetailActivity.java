@@ -131,7 +131,7 @@ public class TopicDetailActivity extends BaseActivity {
     protected void bindDataAndSetListeners() {
 
         super.displayTitleTopbar(titleTopBar, getResources().getString(R.string.topic_detail_text));
-        super.displayActionTopbar(titleTopBar, getResources().getString(R.string.favorite), new FavoriteTextClickListener());
+        super.displayActionTopbar(titleTopBar, getResources().getString(R.string.favorite), new FavoriteTopicClickListener());
 
         queryTopicFavoriteStatus();
 
@@ -185,7 +185,7 @@ public class TopicDetailActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    private class FavoriteTextClickListener implements View.OnClickListener{
+    private class FavoriteTopicClickListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
             handleFavoriteOrCancelAction();

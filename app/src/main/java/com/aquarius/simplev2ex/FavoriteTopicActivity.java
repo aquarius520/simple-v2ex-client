@@ -63,6 +63,7 @@ public class FavoriteTopicActivity extends BaseActivity {
         if (topics != null && topics.size() > 0) {
             mTopicAdapter.update(topics, false);
         }
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override

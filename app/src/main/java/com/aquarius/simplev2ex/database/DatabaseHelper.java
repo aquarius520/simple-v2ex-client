@@ -14,7 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DatabaseHelper";
 
     public static final String DATABASE_NAME = "v2ex.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 
     // member 成员表
     public static final String TABLE_MEMBER_NAME = "member";
@@ -115,6 +115,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String NODE_HEADER = "header";
     public static final String NODE_FOOTER = "footer";
     public static final String NODE_CREATED = "created";
+    public static final String NODE_FAVORITE = "favorite"; // 0 未收藏， 1 收藏
+    public static final String NODE_AVATAR_LARGE = "avatar_large";
+
+    public static final String ALTER_NODE_FAVORITE_SQL = "ALTER TABLE " + TABLE_NODE_NAME +
+            " ADD COLUMN " + TOPIC_FAVORITE + " INTEGER DEFAULT 0 ";
+
+    public static final String ALTER_NODE_AVATAR_SQL = "ALTER TABLE " + TABLE_NODE_NAME +
+            " ADD COLUMN " + NODE_AVATAR_LARGE + " TEXT ";
 
     private static final String CREATE_TABLE_NODE_SQL = "CREATE TABLE " + TABLE_NODE_NAME +
             " ( " +
@@ -148,16 +156,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(ALTER_TABLE_TOPIC_SQL);
         db.execSQL(ALTER_TOPIC_FAVORITE_SQL);
+        db.execSQL(ALTER_NODE_FAVORITE_SQL);
+        db.execSQL(ALTER_NODE_AVATAR_SQL);
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 1 && newVersion == 2) {
+        if (oldVersion < 2) {
             upgradeToVersion2(db);
+            oldVersion = 2;
         }
-        if (oldVersion == 2 && newVersion == 3) {
+        if (oldVersion == 2) {
             upgradeToVersion3(db);
+            oldVersion = 3;
+        }
+        if (oldVersion == 3) {
+            upgradeToVersion4(db);
+            oldVersion = 4;
+        }
+
+        if (oldVersion == 4) {
+            upgradeToVersion5(db);
+            oldVersion = 5;
         }
 
     }
@@ -168,6 +189,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void upgradeToVersion3(SQLiteDatabase db) {
         db.execSQL(ALTER_TOPIC_FAVORITE_SQL);
+    }
+
+    private void upgradeToVersion4(SQLiteDatabase db){
+        db.execSQL(ALTER_NODE_FAVORITE_SQL);
+    }
+
+    private void upgradeToVersion5(SQLiteDatabase db) {
+        db.execSQL(ALTER_NODE_AVATAR_SQL);
     }
 
     @Override
