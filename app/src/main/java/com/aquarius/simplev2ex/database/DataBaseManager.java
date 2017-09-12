@@ -298,8 +298,9 @@ public class DataBaseManager {
         if (TextUtils.isEmpty(key)) {
             return topics;
         }
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        SQLiteDatabase db = null;
         try {
+            db = databaseHelper.getReadableDatabase();
             if (db != null) {
                 String selection = "";
                 if (type.equals("category")) {

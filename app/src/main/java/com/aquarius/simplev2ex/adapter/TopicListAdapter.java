@@ -171,8 +171,23 @@ public class TopicListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             Collections.sort(data, new ListItemComparator());
         }
         mTopics = data;
-        //TODO: List的源码中为何观察者模式，为何调用notifyDataSetChanged();会引起数据源改变和刷新UI
         notifyDataSetChanged();
+    }
+
+    public void removeEmptyModelIfExist() {
+        if (mTopics != null && mTopics.size() > 0) {
+            int index = -1;
+            for(int i = 0; i < mTopics.size() ; i++ ) {
+                TopicItem topic = mTopics.get(i);
+                if (topic.getId() == 0 && topic.getTitle().equals("empty")) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1) {
+                mTopics.remove(index);
+            }
+        }
     }
 
     public void initTopics(List<TopicItem> data) {
