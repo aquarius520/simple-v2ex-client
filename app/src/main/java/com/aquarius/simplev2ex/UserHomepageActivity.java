@@ -60,6 +60,7 @@ public class UserHomepageActivity extends BaseActivity {
     private long created;
 
     private List<TopicItem> mTopics;
+    private TopicItem mHeaderItem;
 
     @Override
     protected void handleIntent(Intent intent) {
@@ -152,11 +153,11 @@ public class UserHomepageActivity extends BaseActivity {
                 OkHttpHelper.getAsync(V2exManager.getUserInfoUrl(username), new UserHeadInfoRequest(mHandler));
         }
 
+        mHeaderItem = new TopicItem.Builder(0, "header").build();
         mTopics = DataBaseManager.init().queryTopicByMember(username);
-        if (!force && mTopics != null && mTopics.size() > 0) {
-
+        if (!force && mTopics.size() > 0) {
             Collections.sort(mTopics, new ListItemComparator());
-
+            mTopics.add(0, mHeaderItem);
             topicListAdapter.update(mTopics, false);
             refreshLayout.setRefreshing(false);
         } else if (NetWorkUtil.isConnected()) {
@@ -227,23 +228,18 @@ public class UserHomepageActivity extends BaseActivity {
         @Override
         public void onResponseSuccess(List<TopicItem> data) {
             TopicItem emptyItem = null;
-            TopicItem headerItem = null;
-            if (data == null || data.size() == 0) {
+            if ((data == null || data.size() == 0) && mTopics.size() == 0) {
                 emptyItem = new TopicItem.Builder(0, "empty").build();
                 data = new ArrayList<TopicItem>(2);
                 data.add(emptyItem);
             }
-            headerItem = new TopicItem.Builder(0, "header").build();
-            data.add(0, headerItem);
 
             topicListAdapter.update(data, true);
             refreshLayout.setRefreshing(false);
 
             if (emptyItem != null) return;
 
-            data.remove(headerItem);
-
-            if(data.size() == 0) return;
+            if(data == null || data.size() == 0) return;
             PersistenceUtil.startServiceInsertTopics(mContext, data);
         }
     }
