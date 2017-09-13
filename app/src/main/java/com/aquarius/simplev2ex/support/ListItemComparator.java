@@ -15,7 +15,7 @@ public class ListItemComparator implements Comparator<TopicItem> {
         if (o1 == null || o2 == null) {
             return 0;
         }
-        if (o1.getCreated() == 0 && o2.getCreated() == 0) {
+        if (o1.getCreated() == o2.getCreated()) {
             return 0;
         }
 
