@@ -18,8 +18,13 @@ public class GlideUtil {
 
     // if use CircleImageView need call dontAnimate()
     public static void showNetworkImage(Context context, String imgUrl, ImageView imageView) {
-        Glide.with(context).load(imgUrl).transform(ROUND_TRANSFORM).placeholder(R.drawable.ic_avatar)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT).dontAnimate().into(imageView);
+        Glide.with(context)
+                .load(imgUrl)
+                .transform(ROUND_TRANSFORM)
+                .placeholder(R.drawable.ic_avatar)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .dontAnimate()
+                .into(imageView);
     }
 
 

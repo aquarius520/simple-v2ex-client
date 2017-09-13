@@ -54,7 +54,7 @@
 
     <!-- 设置 -->
     <string name="setting_main">常规设置</string>
-    <string name="setting_show_img_only_wifi">无图模式</string>
+    <string name="setting_show_img_only_wifi">富文本无图模式</string>
     <string name="setting_show_img_only_wifi_summary">移动网络下不加载图片</string>
     <string name="setting_use_https">使用HTTPS</string>
     <string name="setting_use_https_summary">安全的请求连接，较HTTP响应速度稍慢</string>

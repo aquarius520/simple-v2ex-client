@@ -77,7 +77,7 @@ public class SettingFragment extends PreferenceFragment {
                                 new AsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        GlideUtil.clearDiskCache(getActivity());
+                                        GlideUtil.clearDiskCache(V2exApplication.getInstance());
                                         return null;
                                     }
 
