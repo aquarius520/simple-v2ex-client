@@ -51,13 +51,6 @@
 
         <service android:name=".core.DataService"/>
 
-        <activity android:name=".testlibs.TestActivity" android:screenOrientation="portrait">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-        </activity>
-
         <meta-data android:name="com.aquarius.simplev2ex.config.GlideConfig" android:value="GlideModule"/>
     </application>
 
