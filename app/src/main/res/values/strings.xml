@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Simple V2ex</string>
+    <string name="app_name">V2EX</string>
 
     <string name="newest">最新</string>
     <string name="hot">热议</string>
@@ -44,6 +44,7 @@
 
     <string name="user_name">用户名</string>
     <string name="password">密码</string>
+    <string name="captcha">请输入上图中的验证码</string>
 
 
     <string name="favorite">收藏</string>

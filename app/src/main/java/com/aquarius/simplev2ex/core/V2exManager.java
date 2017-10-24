@@ -148,4 +148,8 @@ public class V2exManager {
         return BASE_HTTPS_URL + "/new/" + nodeName;
     }
 
+    public static String getCaptchaUrl(String once) {
+        return getBaseUrl() + "/_captcha?once=" + once;
+    }
+
 }

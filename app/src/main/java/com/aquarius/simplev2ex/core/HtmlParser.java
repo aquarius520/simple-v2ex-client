@@ -171,7 +171,7 @@ public class HtmlParser {
 
     // 解析登录页面中需要的参数值
     public static HashMap<String, String> getSignInParams(String htmlStr) {
-        HashMap<String, String> params = new HashMap<>(4);
+        HashMap<String, String> params = new HashMap<>(8);
         try {
             Document doc = Jsoup.parse(htmlStr);
             Element body = doc.body();
@@ -181,7 +181,11 @@ public class HtmlParser {
                 Elements inputs = element.getElementsByTag("input");
                 for (Element input : inputs) {
                     if (input.attr("type").equalsIgnoreCase("text")) {
-                        params.put("username_key", input.attr("name"));
+                        if (params.get("username_key") == null) {
+                            params.put("username_key", input.attr("name"));
+                        }else {
+                            params.put("captcha_key", input.attr("name"));
+                        }
                     }
                     else if (input.attr("type").equalsIgnoreCase("password")) {
                         params.put("password_key", input.attr("name"));

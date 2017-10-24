@@ -36,7 +36,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="8dp"
-        android:cursorVisible="false"
         android:textSize="16sp"
         android:hint="@string/user_name"/>
 
@@ -53,6 +52,26 @@
         android:layout_marginBottom="8dp"
         android:textSize="16sp"
         android:hint="@string/password"/>
+
+    <ImageView
+        android:id="@+id/captcha_iv"
+        android:layout_width="240dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <EditText
+        android:id="@+id/captcha_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:padding="10dp"
+        android:background="@drawable/edit_text_bg_selector"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:textSize="16sp"
+        android:hint="@string/captcha"/>
 
 
     <TextView
