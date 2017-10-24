@@ -82,7 +82,6 @@ public class OkHttpHelper {
                 if (prefix) {
                     sb.append("&");
                 }
-                //sb.append(String.format("%s=%s", key, URLEncoder.encode(params.get(key), "UTF-8")));
                 sb.append(URLEncoder.encode(key, "UTF-8")).append("=").append(URLEncoder.encode(params.get(key), "UTF-8"));
                 prefix = true;
             }
@@ -117,9 +116,6 @@ public class OkHttpHelper {
         return builder;
     }
 
-//    public static int randomOnce() {
-//        return (int)( Math.random() * 90000 +10000);
-//    }
 
     private Interceptor htmlInterceptor = new Interceptor() {
         @Override
