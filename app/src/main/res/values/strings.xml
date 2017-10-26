@@ -20,7 +20,7 @@
     <string name="register_date">注册日期: %s</string>
 
     <string name="search">搜索...</string>
-    <string name="exit_app_prompt">再按一次退出Simple V2ex</string>
+    <string name="exit_app_prompt">再按一次退出V2EX</string>
 
     <string name="network_error">网络错误请检查设置，并开启WIFI或移动数据</string>
     <string name="network_error_label">error</string>
