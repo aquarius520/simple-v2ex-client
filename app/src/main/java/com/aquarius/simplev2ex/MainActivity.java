@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.aquarius.simplev2ex.support.StatusBarLightHelper;
 import com.aquarius.simplev2ex.views.TitleTopBar;
 import com.aquarius.simplev2ex.views.thirdparty.BottomTabLayout;
 
@@ -29,10 +30,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+//        }
+        StatusBarLightHelper.setStatusBarLightMode(this, true);
         setContentView(R.layout.activity_main);
         initView();
     }
